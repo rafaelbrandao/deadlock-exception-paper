@@ -1,0 +1,214 @@
+\section{Evaluation}
+
+In this paper we have also empirically evaluated how effective deadlock exception can be.
+
+We had two implementations of reentrant locks where one of them was the one provided by
+Java's \emph{ReentrantLock} and the other was that lock modified to throw exception when
+a deadlock happened. Later we may refer to our implementation as \emph{LockA} and the default
+one as \emph{LockB}.
+
+In order to compare each implementation, we conducted
+a controlled experiment where students had to run two specific programs with deadlocks
+easy to reproduce while collecting the time taken to identify the problem. They also
+had to provide a clear explanation of the problem, describing what the problem is, which method
+calls were involved on it and a description of how it happens, so we could measure answer precision.
+
+\subsection{Experiment Definition}
+
+The goal of our experiment was to analyze the process of bug identification with the purpose of evaluating efficiency of deadlock exceptions,
+in respect to the time spent in order to identify the problem and the accuracy of the descriptions provided by the students. We can define two
+research questions we want to answer in this experiment:
+
+{\bf RQ1.} Is the time spent to identify the bug reduced for implementation with deadlock exception when compared to the default implementation?
+
+The metric we watched to answer this question was the time, in seconds, to finish each question in the test.
+
+{\bf RQ2.} Is the accuracy of bug description improved for implementation with deadlock exception when compared to the default one?
+
+Each question's answer was splitted in a few criterias and each criteria was rated between 0 and 1, where 0 means not present, 0.5 means partially present and 1 for fully present:
+
+\begin{description}
+\item[A.] Correctly classified problem as deadlock.
+\item[B.] Classified problem as different from deadlock.
+\item[C.] Correctly identified method calls involved in the deadlock.
+\item[D.] Correctly identified locks involved in the deadlock. 
+\item[E.] Pointed unrelated methods as part of the deadlock.
+\end{description}
+
+To answer this research question, we have classified students answers as either correct or incorrect. Correct answers should respect the following equation:
+
+\begin{equation}
+  (A - B) + C \geq 1.5 \;
+\end{equation}
+
+We decided to rule out criterias \emph{D} and \emph{E} because the problem statement was not clear they should describe which locks were involved in the deadlock; also, our deadlock implementation at that time could only guarantee at least one deadlock exception to be thrown thus affecting at least one method. In other words, this equation means that a correct answer is whenever the bug was described as deadlock and at least one of the methods involved were identified.
+
+\subsection{Experiment Planning}
+
+In order to evaluate each element described on the previous section, we describe the following statistical hypotheses.
+
+\emph{1) Hypothesis:} To answer \emph{RQ1} regarding the time spent to identify a bug in the code:
+
+\begin{equation}
+  H_{0} : \mu_{TimeLockA} \geq \mu_{TimeLockB}
+\end{equation}
+\begin{equation}
+  H_{1} : \mu_{TimeLockA} < \mu_{TimeLockB}
+\end{equation}
+
+And to answer \emph{RQ2} regarding accuracy of answers:
+
+\begin{equation}
+  H_{0} : \mu_{CorrectAnswersLockA} \leq \mu_{CorrectAnswersLockB}
+\end{equation}
+\begin{equation}
+  H_{1} : \mu_{CorrectAnswersLockA} > \mu_{CorrectAnswersLockB}
+\end{equation}
+
+\emph{2) Design, Instrumentation and Subjects:} For this empirical experiment, we have chosen two metrics: time to answer a question and number of correct answers.
+
+In order to prevent \emph{bias}, we needed to control a few factors during the experiment execution. The first factor was the selection of subjects to participate on this experiment, as different background knowledge could potentially influence chosen metrics. The second factor we had to control was the complexity of programs that each subject. Complexity we define as the amount of files in the program, number of threads and number of locks to analyze; as we assumed that easier programs could have little or no benefit from deadlock exceptions, we wanted to have one program that we considered easy to identify the problem and another that was way more complex, spread in more files and classes, thus reflecting a more realistic case. We provided implementations of each program using either \emph{LockA} or \emph{LockB}: the two possible treatments that we want to compare.
+
+We decided to use Latin Square Design to control these two factors mentioned earlier: subjects and program complexity factors. Since we had N subjects, 2 programs and 2 possible treatments, we disposed subjects in rows and programs in columns of latin squares, randomly assigning in each cell of the square a treatment that could be \emph{LockA} or \emph{LockB}, but also guaranteeing that for any given row or column in this square, each treatment appears only once (see Table 1). Consequently, we have replication, local control and randomization which are the three principles of experiment design. % TODO: add ref source %
+
+\begin{table}
+\begin{center}
+\caption{Latin Square design}
+\begin{tabular}{|l|l|l|}
+\hline
+ & Program 1 & Program 2\\
+\hline
+Subject 1 & LockA & LockB\\
+Subject 2 & LockB & LockA\\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+We wrote two programs with different complexity which were presented in the same order for all subjects. The first program, known as \emph{Bank}, contained 4 classes spread in 4 files, 3 threads, 3 explicit locks, and 82 lines of code in average. The second program, known as \emph{Eclipse} had 15 classes spread in 11 files, 4 threads, 5 explicit locks, and 40 lines of code in average. We expected the first program to be easier to identify the deadlock because it contained fewer classes and files. Each program could use either \emph{LockA} or \emph{LockB} but we randomly assigned a group to each student so that if they fall into group A, they would start with \emph{LockA} in the first question, but change to \emph{LockB} on the second question; or if they fall in group B, they they would start with \emph{LockB} and switch to \emph{LockA} in the second question. We randomly paired subjects in tuples composed of one subject in group A and another subject of group B, then we created latin squares for each one of these pairs, where any remainders were discarded.
+
+% insert each program description here, where the deadlock was, etc. in the end, point to where the source for each pdf is %
+
+We have repeated this experiment for two groups of students with different backgrounds. The first group consisted of undergraduate students attending Programming Language Paradigms course. They had classes about concurrent programming, including exercises in Java using ReentrantLock where deadlocks and other concurrent bugs should be avoided; however, these students were not experienced in this area. The second group consisted of graduate students enrolled in master's degree or PhD program attending Parallel Programming course where they had classes about advanced concepts of parallel programming and had a lot of practical exercises, including implementing their own lock; thus, they were expected to have a lot of experience. We did a survey with the second group to understand their background even further (see charts below) at the end of the experiment.
+
+% TODO: insert chart with survey results
+
+\emph{3) Metrics Collection:} Each one should start the experiment with the first question containing \emph{Program 1} and once they finish to provide an answer, they should request for the second question. At that point, we collect and place a timestamp in their answer. Once they finish the second question containing \emph{Program 2}, then they should again give us a notice so we can leave a new timestamp. We have used these timestamps to measure how long they took to finish each question. We have started this experiment with a time limit for each question of 60 minutes each. However, during the test we realized it could not be sufficient for all students so we expanded to 90 minutes each.
+
+The timestamp was written by students conducting the experiment based on a counter we projected on the laboratory wall in real time. In a few circunstances the subject could write the timestamp when they finish, but we have double checked the value at the time we collected their answer, overwriting in case they did any mistake.
+
+\subsection{Experiment Operation}
+
+We executed this experiment in two different days. In the first day we did it with undergraduate students in replacement of their default exam, so their participation was obligatory but we disclaimed they could optionally leave a comment if they did not want to take part in this research, so we would not use their data. Fortunately no one chose to not participate. In the second day, we did it with graduate students after the last class of Parallel Programming course and it was optional. In total, 31 students participated on the first day and 16 students participated on the second day, but we had to discard 2 students data because they arrived late and they had to leave early.
+
+On the first day we started with a time frame of 2 hours for the whole experiment, so we decided to set a deadline for each question and put a time limit of 1 hour each. Later we expanded the time limit to 1 hour 30 minutes for each question. On the second day we decided to stick with 1 hour each because there was no demand to extend it.
+
+\subsection{Experiment Results}
+
+We can split the experiment analysis in two parts:
+
+\emph{1) Time Analysis:} % TODO put description here %
+
+\begin{table}
+\begin{center}
+\caption{Graduate students ANOVA results}
+\begin{tabular}{|l|l|l|l|l|ll|}
+\hline
+                & Df & Sum Sq  & Mean Sq & F value &   Pr(>F)  &     \\
+\hline  
+replica         &  6 & 5413347 &  902225 &  5.1011 & 0.0080593 & **  \\
+program         &  1 &   19032 &   19032 &  0.1076 & 0.7485379 &     \\   
+{\bf lock}            &  1 & 4150300 & 4150300 & 23.4656 & {\bf 0.0004022} & *** \\
+replica:student &  7 & 4614230 &  659176 &  3.7270 & 0.0223149 & *   \\
+Residuals       & 12 & 2122405 &  176867 &         &           &     \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\emph{2) Accuracy Analysis:} Applying Fisher's exact test we can see that undergraduate students did receive an improvement on accuracy (see Table 2), while graduate students did not have any significant difference for the accuracy (see Table 3).
+
+\begin{table}
+\begin{center}
+\caption{Undergraduate students results presented a two-tailed P value equals 0.0004. The association between rows (groups) and columns (outcomes) is considered to be extremely statistically significant}
+\begin{tabular}{|l|l|l|}
+\hline
+ & Correct & Incorrect\\
+\hline
+LockA & 29 & 2\\
+LockB & 16 & 15\\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}
+\begin{center}
+\caption{Graduate students results presented a two-tailed P value equals 0.3259. The association between rows (groups) and columns (outcomes) is considered to be not statistically significant}
+\begin{tabular}{|l|l|l|}
+\hline
+ & Correct & Incorrect\\
+\hline
+LockA & 13 & 1\\
+LockB & 10 & 4\\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\subsection{Results Interpretation}
+
+We can see that accuracy was indeed improved for unexperienced subjects but may not have any big impact in more experienced subjects, like we expected. For the time metric, however, it's still unclear whether it was indeed improved for unexperienced subjects, but we see significant improvement for more experienced subjects.
+
+We believe that our imposed time limit have limited more drastically the time ranges on the first group because they spent more time on each question. Also the fact it was an exam for them may have delayed the time to answer because they were more careful. We have observed during the experiment that many students wrote their answers but they were reluctant to ask for the next question because they still have plenty of time left and they wanted to make sure it was correct. We did not observe such behavior with the second group of students and we believe it is because they did not have the same pressure to deliver correct results.
+
+\subsection{Threats To Validity}
+
+\dots
+
+% TODO: move this to the end of paper %
+% TODO: add instructions for plc students result analysis %
+\subsection{Attachments}
+
+\noindent
+{\it Instructions in R to evaluate graduate students results}
+\begin{verbatim}
+> exp1.dat = read.table(file="/Users/rafaelbrandao/r_input.dat", header = T)
+> attach(exp1.dat)
+> 
+> replica = factor(replica.)
+> student = factor(student.)
+> program = factor(program.)
+> lock = factor(lock.)
+> plot(time~lock,col="gray",xlab="Lock",ylab="Time(seconds)")
+> anova.ql<-aov(time~replica+student:replica+program+lock)
+> library(MASS)
+> bc <- boxcox(anova.ql,lambda = seq(-3, 5, 1/10))
+> lambda <- bc$x[which.max(bc$y)]
+> lambda
+[1] 0.959596
+> TukeyNADD.QL.REP<-function(objeto1)
++ {
++ y1<-NULL
++ y2<-NULL
++ y1<- fitted(objeto1)
++ y2<- y1^2
++ objeto2<- aov(y2 ~ objeto1[13]$model[,2] +
++ objeto1[13]$model[,3]:objeto1[13]$model[,2]
++ + objeto1[13]$model[,4]+ objeto1[13]$model[,5])
++ ynew <- resid(objeto1)
++ xnew <- resid(objeto2)
++ objeto3 <- lm(ynew ~ xnew)
++ M <- anova(objeto3)
++ MSN <- M[1,3]
++ MSErr <- M[2,2]/(objeto1[8]$df.residual-1)
++ 
++ F0 <- MSN/MSErr
++ p.val <- 1 - pf(F0, 1,objeto1[8]$df.residual-1)
++ p.val
++ }
+> TukeyNADD.QL.REP(anova.ql)
+[1] 0.6863746
+> anova(anova.ql)
+\end{verbatim}
+
