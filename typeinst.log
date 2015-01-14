@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.11.2)  13 JAN 2015 00:53
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.11.2)  14 JAN 2015 02:35
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -847,20 +847,50 @@ Overfull \hbox (9.87335pt too wide) in paragraph at lines 265--265
  []
 
 ) (./sections/evaluation.tex [8] [9] [10] [11] [12]
-Overfull \hbox (51.87299pt too wide) in paragraph at lines 213--213
-[]\OT1/cmtt/m/n/10 > exp1.dat = read.table(file="/Users/rafaelbrandao/r_input.d
-at", header = T)[] 
+Overfull \hbox (41.37308pt too wide) in paragraph at lines 252--252
+[]\OT1/cmtt/m/n/10 exp1.dat = read.table(file="/Users/rafaelbrandao/r_input.dat
+", header = T)[] 
  []
 
-[13]) (./sections/bib.tex
+
+Overfull \hbox (41.37308pt too wide) in paragraph at lines 252--252
+[]\OT1/cmtt/m/n/10 # We set the effect model that will serve as basis for poste
+rior analysis.[] 
+ []
+
+
+Overfull \hbox (72.8728pt too wide) in paragraph at lines 252--252
+[]\OT1/cmtt/m/n/10 # Notice that the factor student is associated with the fact
+or replica since for[] 
+ []
+
+
+Overfull \hbox (72.8728pt too wide) in paragraph at lines 252--252
+[]\OT1/cmtt/m/n/10 # each replica we used a different pair of students. We also
+ included the factor[] 
+ []
+
+
+Overfull \hbox (15.1233pt too wide) in paragraph at lines 252--252
+[]\OT1/cmtt/m/n/10 anova.ql<-aov(time~replica+student:replica+program+lock+lock
+:replica)[] 
+ []
+
+
+Overfull \hbox (78.12276pt too wide) in paragraph at lines 252--252
+[]\OT1/cmtt/m/n/10 # anova.ql<-aov(time**<lambda>~replica+student:replica+progr
+am+lock+lock:replica)[] 
+ []
+
+[13] [14] [15]) (./sections/bib.tex
 
 LaTeX Warning: Empty `thebibliography' environment on input line 5.
 
-) [14] (./typeinst.aux) ) 
+) [16] (./typeinst.aux) ) 
 Here is how much of TeX's memory you used:
  3740 strings out of 494522
  51449 string characters out of 6167205
- 123170 words of memory out of 5000000
+ 127170 words of memory out of 5000000
  6892 multiletter control sequences out of 15000+600000
  11308 words of font info for 44 fonts, out of 8000000 for 9000
  319 hyphenation exceptions out of 8191
@@ -878,10 +908,10 @@ exmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/2014basic
 asic/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2
 014basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texli
 ve/2014basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt9.pfb>
-Output written on typeinst.pdf (14 pages, 199267 bytes).
+Output written on typeinst.pdf (16 pages, 202640 bytes).
 PDF statistics:
- 98 PDF objects out of 1000 (max. 8388607)
- 69 compressed objects within 1 object stream
+ 104 PDF objects out of 1000 (max. 8388607)
+ 73 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
