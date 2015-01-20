@@ -1,5 +1,5 @@
 # Fdb version 3
-["pdflatex"] 1421202945 "typeinst.tex" "typeinst.pdf" "typeinst" 1421202946
+["pdflatex"] 1421725708 "typeinst.tex" "typeinst.pdf" "typeinst" 1421725709
   "/usr/local/texlive/2014basic/texmf-dist/fonts/tfm/adobe/zapfding/pzdr.tfm" 1136768653 1528 f853c4d1b4e0550255e02831fdc8496f ""
   "/usr/local/texlive/2014basic/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1246382020 1004 54797486969f23fa377b128694d548df ""
   "/usr/local/texlive/2014basic/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex9.tfm" 1246382020 996 a18840b13b499c08ac2de96a99eda4bc ""
@@ -26,7 +26,9 @@
   "/usr/local/texlive/2014basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb" 1248133631 32080 340ef9bf63678554ee606688e7b5339d ""
   "/usr/local/texlive/2014basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb" 1248133631 32298 c6d25bb16d1eac01ebdc6d7084126a1e ""
   "/usr/local/texlive/2014basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb" 1248133631 36299 5f9df58c2139e7edcf37c8fca4bd384d ""
+  "/usr/local/texlive/2014basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb" 1248133631 37166 8ab3487cbe3ab49ebce74c29ea2418db ""
   "/usr/local/texlive/2014basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb" 1248133631 36281 c355509802a035cadc5f15869451dcee ""
+  "/usr/local/texlive/2014basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb" 1248133631 36094 798f80770b3b148ceedd006d487db67c ""
   "/usr/local/texlive/2014basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb" 1248133631 35752 024fb6c41858982481f6968b5fc26508 ""
   "/usr/local/texlive/2014basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb" 1248133631 32762 224316ccc9ad3ca0423a14971cfa7fc1 ""
   "/usr/local/texlive/2014basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb" 1248133631 33993 9b89b85fd2d9df0482bd47194d1d3bf3 ""
@@ -84,13 +86,19 @@
   "/usr/local/texlive/2014basic/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1407448600 79385 90e8f7b5ceac5f2f13aa6d89820a027f ""
   "/usr/local/texlive/2014basic/texmf-var/web2c/pdftex/pdflatex.fmt" 1414984255 2497129 e5096958fd7b7cc5b96068332ef18aa6 ""
   "/usr/local/texlive/2014basic/texmf.cnf" 1407448599 628 22556ecf93c636bedfe58c7c9ff4797f ""
+  "img/g1.png" 1421721769 21980 fa260f1e4b6ed6c0e60099b374ae9ed0 ""
+  "img/g2.png" 1421721876 27972 dfbca1513695e42fe911acac318df10e ""
+  "img/g2boxcox.png" 1421721908 28037 686d2e108f060af6505681eb7981845e ""
+  "img/u1.png" 1421716763 21527 07c5fcc6df83cce9f220b06d225f2fb4 ""
+  "img/u2.png" 1421716820 24022 c0807feba895e5ab82f53045c593ed08 ""
+  "img/u2boxcox.png" 1421716908 25409 730c97d6dbab7e30a2cb07f4d13340f1 ""
   "llncs.cls" 1415511598 42849 e98f9316a296920ae82de0017d2b1604 ""
   "sections/abstract.tex" 1421094284 54 3255826504e13485af6e4178e2e15235 ""
   "sections/bib.tex" 1417406086 56 984dc2ef90650eae666e7436ba19b0e1 ""
-  "sections/evaluation.tex" 1421202945 16972 3e3afd772a6245090d94bbd48b964bff ""
+  "sections/evaluation.tex" 1421725705 19553 fe4c8fb7ca79600328b7b8d76986a0a4 ""
   "sections/intro.tex" 1417404370 29 b5c363ecd2e80bcbca53e4c182da06b1 ""
   "sections/proof.tex" 1417408434 14934 cf3036221fa7660738eea982f50a8935 ""
-  "typeinst.aux" 1421202946 2283 bab657f2d8987df5a00c48223101c8d9 ""
+  "typeinst.aux" 1421725709 3144 19168958e430174db4481fc744bfa7c6 ""
   "typeinst.tex" 1420581809 1985 5414f59ef232deb07dff575ed7b35ae7 ""
   (generated)
   "typeinst.pdf"
