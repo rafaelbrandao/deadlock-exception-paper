@@ -1,8 +1,8 @@
-\section{Protocols}
+\chapter{Protocols}
 
 In this chapter, we present the deadlock detection algorithm divided in three parts. In the first part, an overview of the protocol is described and we also present proof that this protocol is sufficient to detect deadlocks between 2 threads and 2 locks (in short, we will call it \emph{2-deadlock}). We further change the protocol to guarantee that exception is raised on both threads. Finally we show pseudocode of the actual implementation we developed on this research.
 
-\subsection{Protocol: Deadlock Detection}
+\section{Protocol: Deadlock Detection}
 We have modified the default implementation of Java's \emph{ReentrantLock} to allow efficient runtime 2-deadlock detection. We take advantage of the current algorithm and some of its guarantees to avoid the need to introduce extra synchronization mechanisms or costly atomic operations.
 
 \begin{enumerate}
@@ -23,7 +23,7 @@ We have modified the default implementation of Java's \emph{ReentrantLock} to al
 \end{enumerate}
 \end{enumerate}
 
-\subsubsection{Assumptions}
+\subsection{Assumptions}
 This protocol's correctness relies on a few guarantees provided by Java's \emph{ReentrantLock} class on its default implementation.
 \begin{enumerate}
 \item The operation of swapping the state of a lock from \emph{unlocked} to \emph{locked} must be done atomically by the thread, so only one thread can be successful at a time.
@@ -32,7 +32,7 @@ This protocol's correctness relies on a few guarantees provided by Java's \emph{
 \item Once the last element in the waiting queue of a lock is read, it should be safe to read all threads in the waiting queue that arrived before the last element. Since the thread who reads the waiting queues is also the one who blocks every thread waiting on the queues, we can guarantee the only updates that could happen concurrently is new insertions at the end of each queue. However insertions in the end of the queue are not important once a last element pointer is obtained.
 \end{enumerate}
 
-\subsection{Formal Proof}
+\section{Formal Proof}
 On this subsection, we proof this protocol is sufficient to detect 2-deadlocks.
 First, we show a proof for the \emph{liveness} property which states we can always detect 2-deadlocks when they happen.
 Lastly, we show a proof for the \emph{safety} property which states we never throw exceptions when 2-deadlocks doesn't really happen.
@@ -91,7 +91,7 @@ If this condition holds, we have a circular dependency between threads \emph{A} 
 
 The only problem with this protocol is the lack of guarantee that both threads involved in a 2-deadlock will throw deadlock exception. If both threads are about to park and are both running the deadlock detection procedure, then the equations 7 and 8 will both be true and deadlock exception will be raised by both threads. However, it is possible that one of the threads did not finish inserting itself on the waiting queue for the lock it desires, then the conflicting thread will hit the case when one of the equations 7 or 8 will be false, thus not throwing a deadlock exception.
 
-\subsection{Protocol: Exception Raised On Both Threads}
+\section{Protocol: Exception Raised On Both Threads}
 We have further extended the previous protocol to allow both threads involved in the deadlock to throw deadlock exceptions. This does not affect how deadlock is detected but what should be done after a deadlock is detected.
 \begin{enumerate}
 \item Each lock has a list of tainted threads. This list should only be read or updated by the owner of that lock, allowing immunity from interference without any extra synchronization cost.
@@ -106,121 +106,9 @@ Each thread would have added their conflicting thread on its owned locks's taint
 but none of them would be able to acquire their respectives desired locks (as in \emph{item 3}),
 thus leaving their references behind for others to cleanup (as in \emph{item 4}). 
 
-\subsection{Implementation}
+\section{Implementation}
 
 In this subsection we present pseudocode for the proposed protocols. Initially we present the pseudocode for the current implementation of \emph{ReentrantLock}, then we present which changes were done on top of that implementation to follow the protocols covered previously. The actual code can be found on our repository (TODO: put code github and reference).
-
-\medskip
-
-\noindent
-{\it Pseudcode of Java's ReentrantLock}
-\begin{verbatim}
-int state;
-Thread owner;
-Node head;
-Node tail;
-
-void lock() {
-  if (!tryFastAcquire()) {
-    slowAcquire();
-  }
-}
-
-boolean tryFastAcquire() {
-  if (!hasQueuedPredecessors() && COMPARE_AND_SET(state, 0, 1)) {
-    setExclusiveOwner(currentThread());
-    return true;
-  }
-  return false;	
-}
-
-// Returns true if current thread
-// is the first in the queue or it's empty
-boolean hasQueuedPredecessors();
-
-void setExclusiveOwner(Thread thread) {
-  owner = thread;
-}
-
-void slowAcquire() {
-  // Creates and atomically enqueue node with current thread
-  Node waiterNode = new Node();
-  enq(waiterNode);
-
-  // Try a few times to acquire the waiterNode and then park
-  // until its predecessor wakes up this thread
-  boolean failed = true;
-  try {
-    while (true) {
-      if (waiterNode.pred == head && tryFastAcquire())) {
-        setHead(waiterNode);
-        failed = false;
-        return;
-      }
-      if (shouldParkAfterFailedAcquire(waiterNode.pred, waiterNode))
-        park();
-    }
-  } finally {
-    if (failed)
-      cancelAcquire(waiterNode);
-  }
-}
-
-void release() {
-  if (tryRelease()) {
-    unparkSuccessor(head);
-  }
-}
-
-boolean tryRelease(int releases) {
-  if (currentThread() != owner)
-    return false;
-  setExclusiveOwner(null);
-  setState(0);
-  return true;
-}
-
-void park() {
-  LockSupport.park(this);
-}
-
-// Wakes up successor of a given node in the waiting queue
-// if necessary by using LockSupport.unpark on its successor.
-void unparkSuccessor(Node);
-
-// Cancel the waiting node and remove from waiting queue.
-// If there's a successor parked, unpark it.
-void cancelAcquire(Node);
-
-// Atomically checks if the node is really the head
-// of the queue and try fastPath codepath.
-// On success, the node is dequeued from queue
-bool tryFastAcquireIfHead(Node);
-
-// Atomically enqueues node in the waiting queue. It repeately
-// tries to COMPARE_AND_SET to update tail until succeeds.
-// If head and tail are not initialized yet, there will be
-// an extra COMPARE_AND_SET on head to a new Node and tail
-// will be set as head.
-void enq(Node);
-
-// Make sure to park only when is guaranteed an unpark signal
-// can be received. It decides based on specific protocol
-// between predecessor of a given node and that node.
-shouldParkAfterFailedAcquire(Node, Node);
-
-// Returns Thread corresponding to the current thread
-Thread currentThread();
-
-// Disables the current thread for thread scheduling
-// purposes unless the permit is available.
-LockSupport.park();
-
-// Makes available the permit for the given thread,
-// if it was not already available.  If the thread
-// was blocked on park then it will unblock.
-LockSupport.unpark(Thread);
-\end{verbatim}
 
 \medskip
 

@@ -1,4 +1,4 @@
-\section{Evaluation}
+\chapter{Evaluation}
 
 In this paper we have also empirically evaluated how effective deadlock exception can be.
 
@@ -13,7 +13,7 @@ easy to reproduce while collecting the time taken to identify the problem. They 
 had to provide a clear explanation of the problem, describing what the problem is, which method
 calls were involved on it and a description of how it happens, so we could measure answer precision.
 
-\subsection{Experiment Definition}
+\section{Experiment Definition}
 
 The goal of our experiment was to analyze the process of bug identification with the purpose of evaluating efficiency of deadlock exceptions,
 in respect to the time spent in order to identify the problem and the accuracy of the descriptions provided by the students. We can define two
@@ -43,11 +43,13 @@ To answer this research question, we have classified students answers as either 
 
 We decided to rule out criterias \emph{D} and \emph{E} because the problem statement was not clear they should describe which locks were involved in the deadlock; also, our deadlock implementation at that time could only guarantee at least one deadlock exception to be thrown thus affecting at least one method. In other words, this equation means that a correct answer is whenever the bug was described as deadlock and at least one of the methods involved were identified.
 
-\subsection{Experiment Planning}
+\section{Experiment Planning}
 
 In order to evaluate each element described on the previous section, we describe the following statistical hypotheses.
 
-\emph{1) Hypothesis:} To answer \emph{RQ1} regarding the time spent to identify a bug in the code:
+\subsection{Hypothesis}
+
+To answer \emph{RQ1} regarding the time spent to identify a bug in the code:
 
 \begin{equation}
   H_{0} : \mu_{TimeLockA} \geq \mu_{TimeLockB}
@@ -65,7 +67,9 @@ And to answer \emph{RQ2} regarding accuracy of answers:
   H_{1} : \mu_{CorrectAnswersLockA} > \mu_{CorrectAnswersLockB}
 \end{equation}
 
-\emph{2) Design, Instrumentation and Subjects:} For this empirical experiment, we have chosen two metrics: time to answer a question and number of correct answers.
+\subsection{Design, Instrumentation and Subjects}
+
+For this empirical experiment, we have chosen two metrics: time to answer a question and number of correct answers.
 
 In order to prevent \emph{bias}, we needed to control a few factors during the experiment execution. The first factor was the selection of subjects to participate on this experiment, as different background knowledge could potentially influence chosen metrics. The second factor we had to control was the complexity of programs that each subject. Complexity we define as the amount of files in the program, number of threads and number of locks to analyze; as we assumed that easier programs could have little or no benefit from deadlock exceptions, we wanted to have one program that we considered easy to identify the problem and another that was way more complex, spread in more files and classes, thus reflecting a more realistic case. We provided implementations of each program using either \emph{LockA} or \emph{LockB}: the two possible treatments that we want to compare.
 
@@ -93,21 +97,25 @@ We have repeated this experiment for two groups of students with different backg
 
 % TODO: insert chart with survey results
 
-\emph{3) Metrics Collection:} Each one should start the experiment with the first question containing \emph{Program 1} and once they finish to provide an answer, they should request for the second question. At that point, we collect and place a timestamp in their answer. Once they finish the second question containing \emph{Program 2}, then they should again give us a notice so we can leave a new timestamp. We have used these timestamps to measure how long they took to finish each question. We have started this experiment with a time limit for each question of 60 minutes each. However, during the test we realized it could not be sufficient for all students so we expanded to 90 minutes each.
+\subsection{Metrics Collection}
+
+Each one should start the experiment with the first question containing \emph{Program 1} and once they finish to provide an answer, they should request for the second question. At that point, we collect and place a timestamp in their answer. Once they finish the second question containing \emph{Program 2}, then they should again give us a notice so we can leave a new timestamp. We have used these timestamps to measure how long they took to finish each question. We have started this experiment with a time limit for each question of 60 minutes each. However, during the test we realized it could not be sufficient for all students so we expanded to 90 minutes each.
 
 The timestamp was written by students conducting the experiment based on a counter we projected on the laboratory wall in real time. In a few circunstances the subject could write the timestamp when they finish, but we have double checked the value at the time we collected their answer, overwriting in case they did any mistake.
 
-\subsection{Experiment Operation}
+\section{Experiment Operation}
 
 We executed this experiment in two different days. In the first day we did it with undergraduate students in replacement of their default exam, so their participation was obligatory but we disclaimed they could optionally leave a comment if they did not want to take part in this research, so we would not use their data. Fortunately no one chose to not participate. In the second day, we did it with graduate students after the last class of Parallel Programming course and it was optional. In total, 31 students participated on the first day and 16 students participated on the second day, but we had to discard 2 students data because they arrived late and they had to leave early.
 
 On the first day we started with a time frame of 2 hours for the whole experiment, so we decided to set a deadline for each question and put a time limit of 1 hour each. Later we expanded the time limit to 1 hour 30 minutes for each question. On the second day we decided to stick with 1 hour each because there was no demand to extend it.
 
-\subsection{Experiment Results}
+\section{Experiment Results}
 
-We can split the experiment analysis in two parts:
+We can split the experiment analysis in two parts: time and accuracy.
 
-\emph{1) Time Analysis:} Time analysis was conducted with R Statistical Software using the inputs\footnote{We provide the inputs we've used in the appendix.} extracted from each experimentation day. We've used the linear model described in Figure 1 that considers the effect of different factors on the response variable similarly to \cite{paola}, but we've also included the effect between each replica and the treatment as explained in \cite{sanchez}.
+\subsection{Time Analysis}
+
+Time analysis was conducted with R Statistical Software using the inputs\footnote{We provide the inputs we've used in the appendix.} extracted from each experimentation day. We've used the linear model described in Figure 1 that considers the effect of different factors on the response variable similarly to Paola's work \cite{paola}, but we've also added the effect between each replica and the treatment as explained by Sanchez in \cite{sanchez}.
 
 \begin{figure}
 \begin{center}
@@ -125,8 +133,6 @@ $\epsilon_{lijk}$ & - random error \\
 \caption{Regression model.}
 \end{center}
 \end{figure}
-
-% Add reference to the source that says I can use interaction(replica, lock) %
 
 Initially, we've plotted the box-plot graphic shown in Figure 2. We can see that answers with \emph{LockB} involved took more time to complete, but suddenly stop to grow not far from where \emph{LockA} reaches its peak. If there was no time limit on each question, we believe that \emph{LockB} times would show a much wider range.
 
@@ -217,7 +223,9 @@ Residuals        & 6 &  181610625 &   30268438 &         &           &     \\
 
 In the end of this paper, we provide the list of inputs and instructions on how to reproduce these results as attachments.
 
-\emph{2) Accuracy Analysis:} Once we collected all answers, we manually evaluated each one of them according to the criterias established previously, where each criteria had an associated value between 0 and 1. Then we've ran a script that evaluates the equation we defined before to classify whether an answer was correct or not. Grouping the results in tables, we have Table 4 and Table 5.
+\subsection{Accuracy Analysis}
+
+Once we collected all answers, we manually evaluated each one of them according to the criterias established previously, where each criteria had an associated value between 0 and 1. Then we've ran a script that evaluates the equation we defined before to classify whether an answer was correct or not. Grouping the results in tables, we have Table 4 and Table 5.
 
 \begin{table}
 \begin{center}
@@ -253,180 +261,46 @@ Meanwhile graduate students results presented a two-tailed P value equals 0.3259
 
 The input and the script to generate the tables are available as attachments in the end of this paper.
 
-% TODO: add the link to the script and the data used (anonymized) %
+% TODO: add script and the data used (anonymized) to appendices or put on github and link %
 
-\subsection{Results Interpretation}
+\section{Results Interpretation}
+
+% TODO: review this section, it was written based on older results %
 
 We can see that accuracy was indeed improved for unexperienced subjects but may not have any big impact in more experienced subjects, like we expected. However, both groups did improve time.
 
 We believe that our imposed time limit have limited more drastically the time ranges on the first group because they spent more time on each question. Also the fact it was an exam for them may have delayed the time to answer because they were more careful. We have observed during the experiment that many students wrote their answers but they were reluctant to ask for the next question because they still have plenty of time left and they wanted to make sure it was correct. We did not observe such behavior with the second group of students and we believe it is because they did not have the same pressure to deliver correct results.
 
-\subsection{Threats To Validity}
+\section{Threats To Internal Validity}
 
-% TODO: threats to validity %
-\dots
+In this experiment, we've collected evidence on how the presence of deadlock exception affects student ability to identify deadlocks accurately. However, we must raise a few considerations regarding the validity of our results.
 
+\subsection{Time Measurement}
 
+Since we wanted to run the experiment in a homogenous environment, we've decided to run it in a laboratory in Federal University of Pernambuco, and we've provided links to download the exercise and a few instructions explaining how to deploy it. We wanted to make it as easy as possible and before we've started the test, we gave a small presentation reproducing step by step the instructions that would be described on each exercise, so everyone could follow up and make the setup at the same time. Once everyone was done, we've started to count the time and allowed them to run the programs and start debugging. However, this procedure was not enough: there was a few students (approximately 3 in total) who did the setup differently and could not execute the program; therefore, they've lost a few minutes until we've fixed that for them. Since they've lost only a few minutes, we have still counted them as part of the experiment and did not discount the time.
 
-% TODO: move attachments to the end of paper instead of this section, or move some of them out of the paper (put as links) %
+Furthermore, some students arrived at the test more than 10 minutes late. We've allowed them to join, but some of the remaining computers in the laboratory had issues like they were not logging in or the mouse was not working. We've lost a few minutes to make them work or find a new computer and once each of them did the setup, we've started to count their time individually.
 
+Whenever a student finished a given question, if the time was below the time limit they had available, we have marked the current timestamp on each student's name in the whiteboard. Each entry inserted was already sorted by time, so we easily tracked whether each student was close to the second question's time limit. We could have automatized this process, but as we did this manually, we should consider potential error in the data by approximately three minutes.
 
-\subsection{Attachments}
+\subsection{Exercises}
 
-\noindent
-{\it Instructions in R to evaluate time}
-\begin{verbatim}
-exp1.dat = read.table(file="/Users/rafaelbrandao/r_input.dat", header = T)
-attach(exp1.dat)
+We understand that the two questions we've used to evaluate the students are far easier than what most software engineers have to deal with in the real world. However we could not use any real world issue because it would easily take the time limit of the experiement for each bug.
 
-replica = factor(replica.)
-student = factor(student.)
-program = factor(program.)
-lock = factor(lock.)
+On the other hand, we've created two questions based on real world bugs that we have found while searching for deadlock bugs in open source repositories. Each question had a particular level of granularity, where one should be easier to find a bug because of the less amount of code to examine and another that should be more difficult because of the reasonable amount of different files to look at.
 
-# Plot the box plot graphic using the response variable (time)
-# associated with the locks with the following command
+Some researchers actually believe that empiric evaluations should not be limited to real projects. Buse claims there are benefits of using non-real artifacts \cite{buse} because it's easier for researchers to translate research questions into successful experiments as it allows a greater control over confouding factors. Otherwise, it would be necessary to turn all participants familiar with the codebase of a real and complex system before even starting the experiment. 
 
-plot(time~lock,col="gray",xlab="Lock",ylab="Time(seconds)")
+\section{Threats to External Validity}
 
-# We set the effect model that will serve as basis for posterior analysis.
-# Notice that the factor student is associated with the factor replica since for
-# each replica we used a different pair of students. We also included the factor
-# lock associated with the replica.
+Let's consider a few conditions that might limit the generalization power of our findings in this experiment.
 
-anova.ql<-aov(time~replica+student:replica+program+lock+lock:replica)
+\subsection{Students}
 
-library(MASS)
-bc <- boxcox(anova.ql,lambda = seq(-3, 5, 1/10))
-# If transformation is needed, we calculate lambda and use it:
-# anova.ql<-aov(time**<lambda>~replica+student:replica+program+lock+lock:replica)
-lambda <- bc$x[which.max(bc$y)]
+Each student which participated in this experiment had a different background. What we did to minimize the differences was to select groups where students had at least basic experience in concurrent programming and they should be familiarized with the types of bugs such codes can have: the first group of students with undergraduate students attended the class Paradigms of Computaional Languages where deadlocks are covered in classes and exercises; the second group with graduate students attended the class Parallel Programming which covered concurrent programming in low level detail in classes and exercises, including deadlock detection.
 
-TukeyNADD.QL.REP<-function(objeto1)
-{
-y1<-NULL
-y2<-NULL
-y1<- fitted(objeto1)
-y2<- y1^2
-objeto2<- aov(y2 ~ objeto1[13]$model[,2] +
-objeto1[13]$model[,3]:objeto1[13]$model[,2]
-+ objeto1[13]$model[,4]+ objeto1[13]$model[,5])
-ynew <- resid(objeto1)
-xnew <- resid(objeto2)
-objeto3 <- lm(ynew ~ xnew)
-M <- anova(objeto3)
-MSN <- M[1,3]
-MSErr <- M[2,2]/(objeto1[8]$df.residual-1)
+Some studies have already addressed the problem of drawing conclusions made with students but some suggest that using students as subjects is as good as using industry professionals \cite{staron}. Runes ran an experiment which shows that there's not much significant differences between undergraduate, graduate and industry professionals, with the exception that undergraduate students often take more time to complete the tasks \cite{runes}.
 
-F0 <- MSN/MSErr
-p.val <- 1 - pf(F0, 1,objeto1[8]$df.residual-1)
-p.val
-}
-TukeyNADD.QL.REP(anova.ql)
-
-plot(anova.ql)
-anova(anova.ql)
-\end{verbatim}
-
-\noindent
-{\it Undergraduate students's time results. Input used in R for analysis}
-\begin{verbatim}
-replica, student, program, lock, time
-1, 1, p1, A, 4996
-1, 1, p2, B, 5367
-1, 2, p1, B, 5070
-1, 2, p2, A, 5260
-2, 3, p1, A, 2700
-2, 3, p2, B, 5306
-2, 4, p1, B, 4490
-2, 4, p2, A, 4017
-3, 5, p1, A, 2340
-3, 5, p2, B, 5290
-3, 6, p1, B, 3377
-3, 6, p2, A, 4473
-4, 7, p1, A, 5400
-4, 7, p2, B, 5360
-4, 8, p1, B, 5400
-4, 8, p2, A, 3641
-5, 9, p1, A, 5400
-5, 9, p2, B, 5400
-5, 10, p1, B, 3600
-5, 10, p2, A, 2406
-6, 11, p1, A, 3290
-6, 11, p2, B, 5370
-6, 12, p1, B, 5400
-6, 12, p2, A, 5320
-7, 13, p1, A, 3424
-7, 13, p2, B, 5356
-7, 14, p1, B, 5400
-7, 14, p2, A, 5160
-8, 15, p1, A, 2593
-8, 15, p2, B, 5279
-8, 16, p1, B, 4705
-8, 16, p2, A, 4535
-9, 17, p1, A, 5160
-9, 17, p2, B, 5430
-9, 18, p1, B, 5250
-9, 18, p2, A, 4246
-10, 19, p1, A, 4967
-10, 19, p2, B, 5413
-10, 20, p1, B, 5400
-10, 20, p2, A, 3804
-11, 21, p1, A, 5280
-11, 21, p2, B, 5160
-11, 22, p1, B, 4174
-11, 22, p2, A, 4886
-12, 23, p1, A, 4271
-12, 23, p2, B, 5569
-12, 24, p1, B, 5400
-12, 24, p2, A, 4788
-13, 25, p1, A, 5400
-13, 25, p2, B, 5239
-13, 26, p1, B, 5310
-13, 26, p2, A, 5390
-14, 27, p1, A, 2027
-14, 27, p2, B, 4271
-14, 28, p1, B, 5090
-14, 28, p2, A, 4450
-15, 29, p1, A, 3000
-15, 29, p2, B, 5315
-15, 30, p1, B, 5400
-15, 30, p2, A, 4210
-\end{verbatim}
-
-\noindent
-{\it Graduate students's time results. Input used in R for analysis}
-\begin{verbatim}
-replica, student, program, lock, time
-1, 1, p1, A, 1757
-1, 1, p2, B, 2404
-1, 2, p1, B, 1777
-1, 2, p2, A, 1716
-2, 3, p1, A, 1342
-2, 3, p2, B, 2552
-2, 4, p1, B, 2597
-2, 4, p2, A, 1238
-3, 5, p1, A, 1572
-3, 5, p2, B, 2248
-3, 6, p1, B, 3168
-3, 6, p2, A, 2460
-4, 7, p1, A, 1822
-4, 7, p2, B, 2455
-4, 8, p1, B, 2486
-4, 8, p2, A, 2434
-5, 9, p1, A, 3503
-5, 9, p2, B, 3600
-5, 10, p1, B, 2454
-5, 10, p2, A, 1753
-6, 11, p1, A, 1830
-6, 11, p2, B, 3300
-6, 12, p1, B, 2880
-6, 12, p2, A, 890
-7, 13, p1, A, 648
-7, 13, p2, B, 940
-7, 14, p1, B, 2247
-7, 14, p2, A, 1363
-\end{verbatim}
 
 
 
