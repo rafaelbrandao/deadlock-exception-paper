@@ -1,0 +1,77 @@
+\chapter{Bug Reports Study}
+
+We wanted to find more evidence that the most common type of deadlock is indeed composed by only two threads and two locks. In this chapter, we will describe how we did our analysis in multiple repositories and what results we've found.
+
+\section{Context}
+
+% TODO: move this to related work chapter %
+
+There are two main types of deadlocks: resources deadlocks and communication deadlocks.
+
+Resource deadlocks: a set of threads is holding some resources and is waiting for the resources which have already been held by other threads in the set.
+Communication deadlocks: some threads wait for some messages or signals from other threads which are paused and unable to send the required messages/signals or have already sent them before a waiting thread starts to wait for it.
+
+In this work we will focus on resource deadlocks where locks are resources.
+
+
+\section{Data Collection}
+
+% TODO: describe how these bugs were searched, and later how they were sampled (script)
+% 1. Lucene: 27 bugs - https://docs.google.com/spreadsheets/d/1tAajYkR3MhHFPScCIv7D6WXIbhibF7aoWXviTv-sdGE/edit?usp=sharing
+
+% 2. Eclipse: 406 bugs - https://docs.google.com/spreadsheets/d/1PpVRQyJfBmS3UjMmDX1uwgoOdffCecdwM5jMp3BmZNI/edit?usp=sharing
+
+% 3. OpenJDK: 108 bugs - https://docs.google.com/spreadsheets/d/1aqEbnGhVvVcyRjgbsYnTc1u3tNO43WW2BsAw_4FTn3E/edit?usp=sharing
+
+
+We've sampled a list of 225 bugs out of 541 bugs in total to achieve a confidence level of 95\% and sampling error of 5\%. For each of those bugs we classified its category according to the following criteria:
+
+A: We are confident this a resource deadlock. We should be able to provide a short explanation of how the bug occurs, which or how many threads are involved and how many locks are involved in this bug.
+
+B: We are confident this is not a resource deadlock, so it must be a communication deadlock. It might be a lost notify/signal bug. We should be able to identify if this is a lost notify/signal or have clear evidence this is not a resource deadlock (please adding a note whenever possible).
+
+C: We are confident this is a false-positive for "deadlock" search. The term was used as a synonym of "hang" or "infinite loop", or to refer to another deadlock bug. In some cases, it is possible that a bug refers to another bug which was fixing a deadlock, so the initial bug may not be deadlock-related and just fix a regression for another bug (which could be deadlock-related). In other words, this is not a deadlock bug at all.
+
+D: We are not confident whether this is a resource deadlock or a communication deadlock, or even if this is a false-positive for deadlock. There's not enough information in the bug report, or the information is just inconclusive. Since we are not experts on any of these repositories, it's hard to classify for sure in another category.
+
+Since our focus is on resource deadlocks, we want to understand how many resource deadlock bugs did involve 2 threads and 2 resources, so we will discard bugs in B and C category. In the worse case scenario, all bugs in category D are resource deadlocks and does not involve simply 2 threads and 2 resources. Since we are being conservative in our analysis, in the worse case scenario we have the following:
+
+\% of interested bugs: [Bugs A which are 2 threads and 2 resources] / ([Bugs A] + [Bugs D])
+
+\section{Data Labeling}
+
+In order to minimize error on our classification, we must look at all available data for a certain bug. Sometimes a bug points to another one as a duplicate, so we should use those links if the initial bug is not clear enough. In order to organize how we investigate, we should follow these steps:
+
+1. Look at bug title and bug main description (usually the first comment). Sometimes the reporter have an idea of how the bug occurs and which threads are involved, so this is a big help.
+
+2. Look at further comments and see if someone understood this bug completely. Someone must have provided a reasonable explanation of how this bug occurs. If the category is already clear, then finish these steps; otherwise proceed.
+
+3. If available, look at the patches (specially the final patch) and what changes have been made. If uncertain about this bug being in category B and the patch either moves or adds a notifyAll call, then it most likely is a category B bug. If this is not the case, then proceed.
+
+4. If available, look at the related bugs or duplicates. It's often to find an initial bug that is unclear but which points out to a duplicate that have been largely discussed and is clear. Restart from step 1 for each of those related bugs. If a category was not assigned yet, then proceed.
+
+5. See other attachments if available, like text files with thread dumps or stack traces. If they provide enough information to clarify which category it is, then assign a category to it, otherwise proceed.
+
+6. Classify this bug in the category D.
+
+\subsection{Guidelines}
+
+Category A will be only assigned when there's a clear comment in the bug explaining what threads and which resources are involved or other evidences can clarify without doubt how many threads and lock resources are involved. In a few cases, the explanation is not fully clear but the attachment provides a clear thread dump showing which threads are involved and which locks each one is holding and waiting for, so we can also use this information to make a final decision.
+
+Category B can be classified by also looking into source code changes when we are almost clear about its category: if the patch changes areas of the code where a notifyAll is added or moved, then it is most likely a category B indeed. Sometimes it is just a semantic deadlock where one threads is in an infinite loop waiting for others to finish and other threads are stuck waiting to acquire a lock the first thread already acquired; in this case, we also understand as a communication deadlock: the "message" which the first thread have been waiting is whether the other threads have finished.
+
+Category C is often easy to classify since the bug often explains another kind of bug and then cites the term "deadlock" as a synonym for "hang". As stated previously, if this bug only refers to another bug (such as a regression) that mentions deadlock or fixes a deadlock, then this bug might not be a deadlock by itself, just a fix of another previous fix, which would also fall into this category.
+
+Category D is for all other bugs which could not be classified as either A, B or C.
+
+\subsection{Data Fields}
+
+\subsubsection{TYPE (locks/synchronized, wait/notify, ...)}
+
+This field should be used to specify what kinds of resources a certain bug use. For example if there are two threads and they're in a circular deadlock, then this field should be locks/synchronized, or if you are sure that explicit locks were used for both, then just locks is enough, or if only synchronized blocks/methods are involved, then just synchronized.
+
+The symbol + indicates a separation between threads, so for example "locks + wait" means that one thread holds a lock and the other waits". If you think it's confusing just add a comment in the "notes" section.
+
+\subsubsection{\# of THREADS, \# of RESOURCES}
+
+Whenever possible, state the number of threads and resources involved, even if this is in the category B. If you don't know how many resources but know how many threads, then just fill the field for the number of threads and leave the other blank.

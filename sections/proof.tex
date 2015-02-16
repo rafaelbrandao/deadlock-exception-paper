@@ -108,19 +108,19 @@ thus leaving their references behind for others to cleanup (as in \emph{item 4})
 
 \section{Implementation}
 
-In this subsection we present pseudocode for the proposed protocols. Initially we present the pseudocode for the current implementation of \emph{ReentrantLock}, then we present which changes were done on top of that implementation to follow the protocols covered previously. The actual code can be found on our repository (TODO: put code github and reference).
+In this subsection we present pseudocode for the proposed protocols. We attach in the appendix pseudocode for the current implementation of \emph{ReentrantLock} which we will not focus here. Instead, we will look into what changes were done on top of that implementation to follow the protocols covered previously. The actual code can be found on our github repository.
 
-\medskip
+%TODO: put code on github and reference%
 
 \noindent
 {\it Changes on ReentrantLock}
 \begin{verbatim}
 // This is a thread-local inside a lock.
-// It keeps the list of locks the current thread owns.
+// Each thread keeps the list of locks they own.
 DEFINE_PER_THREAD(vector<int>, ownedLocks);
 
-// As soon as a lock is acquired, the thread sets itself
-// as the owner. When it's released, the owner is set to null.
+// As soon as a lock is acquired or release, this function is called.
+// Based on that, we call register or unregister owned lock.
 void setExclusiveOwner(Thread thread) {
   owner = thread;
   if (owner == null) {
@@ -130,7 +130,7 @@ void setExclusiveOwner(Thread thread) {
   }
 }
 
-// These functions register or unregister the currnet lock
+// These functions register or unregister the current lock
 // in the thread-local list ownedLocks.
 registerOwnedLock();
 unregisterOwnedLock();
