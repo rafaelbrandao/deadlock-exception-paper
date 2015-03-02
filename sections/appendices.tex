@@ -1,5 +1,156 @@
 \begin{appendices}
 
+\chapter{Sample Size Calculation In R}
+
+\noindent
+\begin{verbatim}
+sample.size = function(c.lev, margin=.5,
+                       c.interval=.05, population) {
+  z.val = qnorm(.5+c.lev/200)
+  ss = (z.val^2 * margin * (1-margin))/c.interval^2
+  p.ss = round((ss/(1 + ((ss-1)/population))), digits=0)
+  METHOD = paste("Recommended sample size for a population of ",
+                 population, " at a ", c.lev,
+                 "% confidence level", sep = "")
+  structure(list(Population = population,
+                 "Confidence level" = c.lev,
+                 "Margin of error" = c.interval,
+                 "Response distribution" = margin,
+                 "Recommended sample size" = p.ss,
+                 method = METHOD),
+            class = "power.htest")
+}
+
+sample.size(95, 0.5, 0.05, 541)
+\end{verbatim}
+
+\chapter{Sample Analsysis in Python}
+
+\noindent
+\begin{verbatim}
+import sys
+
+f = open(sys.argv[1], "r")
+headers = f.readline().split('\t')
+lists = [ list() for i in xrange(4) ]
+
+for line in f.readlines():
+  data = line.split('\t')
+  data = [ i.strip() for i in data ]
+  unit = tuple((data[0], data[2], data[3], data[4], data[5], data[6]))
+  group = ord(data[1])-ord('A')
+  lists[group].append(unit)
+
+total = 0
+overall = len(lists[0]) + len(lists[3])
+for u in lists[0]:
+  if u[2] == u[3] and u[2] == '2':
+    total += 1
+
+print '== results =='
+print 'found', str(total), 'deadlock bugs with 2 threads and 2 locks'
+print 'found', str(overall), 'potential deadlock bugs'
+print 'rate (worse case): ', str(float(total)/float(overall)*100), '%'
+print 'rate (best case): ', str(float(total+len(lists[3]))/float(overall)*100), '%'
+\end{verbatim}
+
+
+\chapter{Fetch Bug Reports Data}
+
+\noindent
+\begin{verbatim}
+import random
+import sys
+import datetime
+
+import json
+import urllib2
+import os.path
+
+f = open(sys.argv[1], "r")
+headers = f.readline().split('\t')
+
+path = './bugs/'
+bugs = list()
+
+for line in f.readlines():
+  data = line.split('\t')
+  data = [ i.strip() for i in data ]
+  bugs.append(data[0])
+  rep,bug_number = data[0].split('-')
+
+  filepath = os.path.join(path, data[0] + '.xml')
+  if os.path.exists(filepath):
+    continue
+  print 'fetching data for', data[0]
+  url = ''
+  if rep == 'ECLIPSE':
+    url = ("https://bugs.eclipse.org/bugs/show_bug.cgi?" +
+           "ctype=xml&id=" + bug_number)
+  elif rep == 'JDK':
+    url = ('https://bugs.openjdk.java.net/si/jira.issueviews:' +
+           'issue-xml/' + data[0] + '/' + data[0] + '.xml')
+  elif rep == 'LUCENE':
+    url = ('https://issues.apache.org/jira/si/jira.issueviews:' +
+           'issue-xml/' + data[0] + '/' + data[0] + '.xml')
+
+  u = urllib2.urlopen(url)
+  content = u.read()
+  out = open(filepath, "wb")
+  out.write(content)
+  out.close()
+  print 'done writing', filepath
+
+def delta_hours(ts1,ts2):
+  return round((ts2-ts1).total_seconds() / 60.0 / 60.0,2)
+
+def import_timestamp_jira(str):
+  s = str.split()
+  s = ' '.join(s[1:5])
+  return datetime.datetime.strptime(s, "%d %b %Y %H:%M:%S")
+
+def import_timestamp_bugzilla(str):
+  s = str.split()
+  s = ' '.join(s[0:2])
+  return datetime.datetime.strptime(s, "%Y-%m-%d %H:%M:%S")
+
+def import_from_jira(bug):
+  import xml.etree.ElementTree as ET
+  tree = ET.parse('./bugs/'+bug+'.xml')
+  root = tree.getroot()
+  t = root.findall('channel')[0].findall('item')[0]
+  created = t.findall('created')[0].text
+  resolved = t.findall('resolved')[0].text
+  ts1 = import_timestamp_jira(created)
+  ts2 = import_timestamp_jira(resolved)
+  c = t.findall('comments')
+  comments = 0
+  if len(c) > 0:
+    comments = len(c[0].findall('comment'))
+  return tuple((delta_hours(ts1,ts2),comments))
+
+def import_from_bugzilla(bug):
+  import xml.etree.ElementTree as ET
+  tree = ET.parse('./bugs/'+bug+'.xml')
+  root = tree.getroot()
+  t = root.findall('bug')[0]
+  created = t.findall('creation_ts')[0].text
+  resolved = t.findall('delta_ts')[0].text
+  ts1 = import_timestamp_bugzilla(created)
+  ts2 = import_timestamp_bugzilla(resolved)
+  comments = len(t.findall('long_desc'))
+  return tuple((delta_hours(ts1,ts2), comments))
+
+for bug in bugs:
+  rep = bug.split('-')[0]
+  r = tuple()
+  if rep == 'ECLIPSE':
+    r = import_from_bugzilla(bug)
+  else:
+    r = import_from_jira(bug)
+  print str(r[0]) + '\t' + str(r[1])
+\end{verbatim}
+
 \chapter{Java ReentrantLock pseudocode}
 
 \noindent
