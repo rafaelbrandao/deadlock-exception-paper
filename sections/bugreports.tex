@@ -1,30 +1,34 @@
-\chapter{Bug Reports}
+\chapter{Bug Reports Study}
 
-Previous study have noticed some interesting pattern about deadlock concurrency bugs: the vast majority of deadlocks only involved at most two resources (30 ouf ot 31 bugs) \cite{lu}, only one bug was triggered by three threads waiting for three resources circularly. Since we suspect deadlocks with two resources were indeed more common in practice, we've decided to investigate this finding with a bigger sample of bug reports related to deadlock.
+In a previous study \cite{lu}, some interesting pattern about concurrency bugs was found: 30 out ot 31 deadlock cases involved at most two resources, where only one case was triggered by three threads waiting for three resources circularly. After that we also suspected that deadlocks between 2 threads and 2 resources are more common than other resource deadlocks, so we've decided to investigate this observation further with a bigger sample of real-world deadlock bug reports from open-source projects.
 
-In this chapter, we'll present our bug reports study: how we've collected the samples, how we've analysed the data and what results we've found.
+In this chapter, we'll present how we have conducted our bug reports study. We can split it in three parts: how we've collected the sample, how we've classified each bug in that sample, and what results we have found.
 
 \section{Sample Collection}
 
-We've chosen three open source projects which used Java as main programming language and made use of concurrent programming. The first project we've chosen was Lucene: a text search engine library that can be used along many applications, where concurrent programming was used to deliver high performance. The second project was Eclipse: one of the most popular IDE for java developers. The third project was OpenJDK: open-source implementation of the Java Platform. These projects have vast bug report repositories that we could use to search for reports and developers had the habit of commenting details about the bug and the solution to fix it on the bug report itself which was very important in our study.
+We've chosen three open source projects which used Java as main programming language and made use of concurrent programming: Lucene, Eclipse and OpenJDK.
 
-We have initially searched in each repository for the keyword \emph{deadlock}, and we've collected 541 bug reports in total. Each project had a different bug repository, so we've changed slightly to find relevant bug reports.
+Lucene\footnote{Lucene: http://lucene.apache.org/} is a text search engine library that can be used along many applications, where concurrent programming was used to deliver high performance. Eclipse\footnote{Eclipse: https://eclipse.org/} is one of the most popular IDE for java developers. OpenJDK\footnote{OpenJDK: http://openjdk.java.net/} is an open-source implementation of the Java Platform. These three projects share a few similarities: they're written in Java; they have vast bug report repositories and tools to search for bug reports; development culture of reviews inside bug reports by discussing solutions to fix the problem. In particular, this last point is very important since we need to analyse bug reports and infer their classification.
 
-In Lucene, we've searched for bugs matching the word "deadlock" anywhere in the bug report (i.e. in summary or in comments), in module "lucene-core" with issue type as "bug", where status was "closed", as we are focusing on bugs that were resolved. From this search, we've found 27 bugs\footnote{http://goo.gl/DhVI3t}.
+We have initially searched in each repository for the keyword \emph{deadlock}, and we've collected 541 bug reports in total. Each project had a different bug repository, so we've changed slightly the query parameters to find relevant bug reports.
+
+In Lucene, we've searched for bugs matching the word "deadlock" anywhere in the bug report (i.e. in summary or in comments), in module "lucene-core" with issue type as "bug", where status was "closed". From this search, we've found 27 bugs\footnote{http://goo.gl/DhVI3t}.
 
 In Eclipse, we've searched for "deadlock" in summary, where resolution was set to "fixed" and status was set to "resolved". From this search, we've found 406 bugs\footnote{http://goo.gl/qQnrEm}.
 
 In OpenJDK, we've searched the word "deadlock" in summary, in module "JDK" with issue type as "bug", where resolution was set to "fixed", status was "resolved". From this search, we've found 108 bugs\footnote{http://goo.gl/xYFfsO}.
 
-Assuming normal distribution in bug reports population, we've calculated the minimal size of the sample where we could achieve 95\% of confidence level and 5\% sampling error, setting response distribution to 50\% so we could find the biggest sample size\footnote{More about 'response distribution' in http://www.raosoft.com/samplesize.html}. We've found minimal size as 225, so we've created a random sample of 225 bugs out of all bugs we've found. In appendix we provide the code we've used to calculate the sample size.
+Assuming normal distribution in bug reports population, we've calculated the minimal size of the sample where we could achieve 95\% of confidence level and 5\% sampling error (also setting response distribution to 50\% to find the biggest sample size\footnote{More about 'response distribution' in http://www.raosoft.com/samplesize.html}). We've found minimal size as 225, so we've created a random sample of 225 bugs out of all bugs we've found. In appendix we provide the code we've used to calculate the sample size.
 
 \section{Data Labeling}
 
-We've merged all bug reports of our random sample in one single table where the prefix of each bug number could be either \emph{LUCENE}, \emph{ECLIPSE} or \emph{JDK}, followed by the bug number inside its own repository. Then we've added a category label field which is a character between "A" and "D" that we would set after manual inspections and following some criterias that we will present next. Besides that, we've added other fields in this table, such as \emph{"TYPE"}, \emph{"# of THREADS"}, \emph{"# of RESOURCES"} and \emph{"NOTES"}. The final version of this table\footnote{http://goo.gl/zNsIGz} also contains \emph{"TIME (HOURS)"} and \emph{"COMMENTS"} which were extracted automatically from the bug reports.
+We've merged all bug reports of our random sample in one single table. The first field was the name of the bug, each name was composed by a prefix that could be either \emph{LUCENE}, \emph{ECLIPSE} or \emph{JDK}, followed by the bug number inside its own repository. Then we've added a category label field which could be "A", "B", "C" or "D". The category was added after manual inspections based on criterias that we will present next. Furthermore we've added other fields in this table such as \emph{"TYPE"}, \emph{"# of THREADS"}, \emph{"# of RESOURCES"} and \emph{"NOTES"}, they'll be described next.
+
+The final version of this table\footnote{http://goo.gl/zNsIGz} also contains \emph{"TIME (HOURS)"} and \emph{"COMMENTS"}, but these were extracted automatically from the bug reports data and we did not use them for this analysis.
 
 \subsection{Field "CATEGORY"}
 
-This is the most important field, as we want to be able to identify what kind of deadlock this bug represents, in case it is indeed deadlock related. We have four different values for this field, and they must be one of the following:
+This is one of the most important fields, as we want to be able to identify what kind of deadlock this bug represents, or if it's not even a real deadlock. We have four different values for this field, and they must be one of the following:
 
 \emph{A:} We are confident this a resource deadlock. We should be able to provide a short explanation of how the bug occurs, which or how many threads are involved and how many locks are involved in this bug.
 
@@ -58,6 +62,7 @@ In order to minimize error on our classification, we've created a protocol that 
 
 6. Classify this bug in the category D.
 
+
 \subsection{Fields "\# of THREADS" and "\# of RESOURCES"}
 
 Whenever possible, the reviewer should state the number of threads and resources involved, even if this is in the category B. If it's unknown how many resources but it is clear how many threads are involved, then only one of them should be filled and the other field should remain blank.
@@ -72,15 +77,15 @@ The symbol + indicates a separation between threads, so for example "locks + wai
 
 This field was encouraged to be used specially to remind other reviewers in the future of how the conclusion was made for cases where it was tricky to choose the category.
 
-\section{Data Analysis}
+\section{Results Analysis}
 
-Since our focus is on resource deadlocks, we want to understand how many resource deadlock bugs did involve 2 threads and 2 resources, so we will discard bugs in B and C category. In the worse case scenario, all bugs in category D are resource deadlocks and does not involve simply 2 threads and 2 resources. As we are being conservative in our analysis, in the worse case scenario we have the following:
+As we want to understand how many resource deadlock bugs did involve 2 threads and 2 resources, we discard bugs in B and C category because they're not resource deadlocks. What we have left are the bugs we could not determine its category. In the worse case scenario, all bugs in category D should be resource deadlocks which would involve something different than 2 threads and 2 resources, given by the following equation:
 
 \begin{equation}
 bugs\_ratio = \frac{ bugs(A, threads=2, resources=2) }{ bugs(A) + bugs(D) } \; .
 \end{equation}
 
-In that equation, \emph{bugs(...)} returns the number of bug reports that matches the parameters. Thus $bugs\_ratio$ is the worse case scenario of how often deadlock bugs are the classic case. If we want to look at the best case scenario, then all bugs classified in D category must also be classic deadlocks. The numbers we've found are 54.7\% in the worse case and 95.29\% on the best case. From all resource deadlocks we've found (in category A), 92.07\% (93 out of 101) were classic deadlocks. We provide the script that analyse this data in the appendix section.
+In that equation, \emph{bugs(...)} returns the number of bug reports that matches the parameters. Thus $bugs\_ratio$ represents the worse case scenario. However if we want to look at the best case scenario, then all bugs classified in D category must also be classic resource deadlocks.
 
 \begin{table}
 \begin{center}
@@ -98,9 +103,38 @@ D & 69 \\
 \end{center}
 \end{table}
 
-However our conservative analysis may also be too unrealistic. If the distribution of bugs in D follows the proportions we've found for A, B and C, and the distribution of classic deadlocks also follows the one we've found, we can classify all bugs in D and remove this group completely: 45 bugs would be in A where 92.07\% of them (that is, 41) are classic deadlocks, 14 bugs would be in B, and 10 bugs would be in C.
+The numbers we've found are 54.7\% in the worse case and 95.29\% on the best case. In category A, we've found 93 bugs of classic deadlocks. That means \textbf{from all resource deadlocks we've found, 92.07\% of them were classic deadlocks}, which corroborates with the finding of study conducted by Lu, Shan, et al \cite{lu}. Also, \textbf{75.93\% of deadlock bugs were classified as resource deadlocks} which shows how popular resource deadlocks are in comparison to communication deadlocks.
 
-Running the same equation defined previously but now with $bugs(D) = 0$ and the other groups sizes updated, we find 91.7\% of resource deadlocks involved 2 threads and 2 locks only.
+We can also look at bugs in category D differently and assume that their distribution will follow the proportions of bugs we've found for A, B and C. We can do the same for bugs inside category A.
 
+When we reclassify all bugs in D in other categories, we'll have the following: 45 new bugs in A where 41 bugs should also be classic deadlocks; 14 new bugs in B; and 10 new bugs in C. We can see the updated values in the following table.
 
+\begin{table}
+\begin{center}
+\caption{Bug Reports Categories Proportionally Distributed.}
+\begin{tabular}{|l|l|}
+\hline
+Category & Number of Bugs \\
+\hline
+A & 146 \\   
+B & 46 \\
+C & 33 \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{equation}
+bugs\_ratio = \frac{ [ bugs(A, threads=2, resources=2) = 134 ] }{ [bugs(A) = 146] + [bugs(D) = 0] } \; .
+\end{equation}
+
+Running the same equation again with the new values, \textbf{we estimate that 91.7\% of resource deadlocks should be classic deadlocks if we could predict bug categories in D}.
+
+\section{Findings}
+
+As we've highlighted in the previous section, classic deadlocks are by far the most popular type of resource deadlocks; also, resource deadlocks are more popular than communication deadlocks. This gives us evidence that if we can solve the problem of deadlock detection for the classical case, that is, between 2 threads and 2 locks, we can cover most of the bugs.
+
+We believe that giving developers a signal that something is wrong in the code (i.e. an exception) is much more powerful than showing nothing (as it happens today). Exceptions provide an easy framework to reason about potential issues in the code and makes easier to handle bugs once they were detected. And even if the bug is not handled, it still gives a signal to developers that something is wrong and should be fixed.
+
+In the next chapter, we will present our deadlock detection algorithm we've built that will throw an exception when a classical deadlock happens. Following that chapter, we will show an experiment we did with students to test whether these exceptions are indeed helpful to find problems in the code.
 
