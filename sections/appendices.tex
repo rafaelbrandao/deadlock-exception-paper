@@ -24,7 +24,7 @@ sample.size = function(c.lev, margin=.5,
 sample.size(95, 0.5, 0.05, 541)
 \end{verbatim}
 
-\chapter{Sample Analsysis in Python}
+\chapter{Sample Analysis in Python}
 
 \noindent
 \begin{verbatim}
@@ -51,7 +51,8 @@ print '== results =='
 print 'found', str(total), 'deadlock bugs with 2 threads and 2 locks'
 print 'found', str(overall), 'potential deadlock bugs'
 print 'rate (worse case): ', str(float(total)/float(overall)*100), '%'
-print 'rate (best case): ', str(float(total+len(lists[3]))/float(overall)*100), '%'
+best_case = str(float(total+len(lists[3]))/float(overall)*100)
+print 'rate (best case): ', best_case, '%'
 \end{verbatim}
 
 
