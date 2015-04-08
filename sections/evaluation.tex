@@ -1,4 +1,4 @@
-\chapter{Evaluation}
+\section{Usability Evaluation}
 
 In this paper we have also empirically evaluated how effective deadlock exception can be.
 
@@ -13,7 +13,7 @@ easy to reproduce while collecting the time taken to identify the problem. They 
 had to provide a clear explanation of the problem, describing what the problem is, which method
 calls were involved on it and a description of how it happens, so we could measure answer precision.
 
-\section{Experiment Definition}
+\subsection{Experiment Definition}
 
 The goal of our experiment was to analyze the process of bug identification with the purpose of evaluating efficiency of deadlock exceptions,
 in respect to the time spent in order to identify the problem and the accuracy of the descriptions provided by the students. We can define two
@@ -43,11 +43,11 @@ To answer this research question, we have classified students answers as either 
 
 We decided to rule out criterias \emph{D} and \emph{E} because the problem statement was not clear they should describe which locks were involved in the deadlock; also, our deadlock implementation at that time could only guarantee at least one deadlock exception to be thrown thus affecting at least one method. In other words, this equation means that a correct answer is whenever the bug was described as deadlock and at least one of the methods involved were identified.
 
-\section{Experiment Planning}
+\subsection{Experiment Planning}
 
 In order to evaluate each element described on the previous section, we describe the following statistical hypotheses.
 
-\subsection{Hypothesis}
+\subsubsection{Hypothesis.}
 
 To answer \emph{RQ1} regarding the time spent to identify a bug in the code:
 
@@ -67,7 +67,7 @@ And to answer \emph{RQ2} regarding accuracy of answers:
   H_{1} : \mu_{CorrectAnswersLockA} > \mu_{CorrectAnswersLockB}
 \end{equation}
 
-\subsection{Design, Instrumentation and Subjects}
+\subsubsection{Design, Instrumentation and Subjects.}
 
 For this empirical experiment, we have chosen two metrics: time to answer a question and number of correct answers.
 
@@ -97,23 +97,23 @@ We have repeated this experiment for two groups of students with different backg
 
 % TODO: insert chart with survey results
 
-\subsection{Metrics Collection}
+\subsubsection{Metrics Collection.}
 
 Each one should start the experiment with the first question containing \emph{Program 1} and once they finish to provide an answer, they should request for the second question. At that point, we collect and place a timestamp in their answer. Once they finish the second question containing \emph{Program 2}, then they should again give us a notice so we can leave a new timestamp. We have used these timestamps to measure how long they took to finish each question. We have started this experiment with a time limit for each question of 60 minutes each. However, during the test we realized it could not be sufficient for all students so we expanded to 90 minutes each.
 
 The timestamp was written by students conducting the experiment based on a counter we projected on the laboratory wall in real time. In a few circunstances the subject could write the timestamp when they finish, but we have double checked the value at the time we collected their answer, overwriting in case they did any mistake.
 
-\section{Experiment Operation}
+\subsection{Experiment Operation}
 
 We executed this experiment in two different days. In the first day we did it with undergraduate students in replacement of their default exam, so their participation was obligatory but we disclaimed they could optionally leave a comment if they did not want to take part in this research, so we would not use their data. Fortunately no one chose to not participate. In the second day, we did it with graduate students after the last class of Parallel Programming course and it was optional. In total, 31 students participated on the first day and 16 students participated on the second day, but we had to discard 2 students data because they arrived late and they had to leave early.
 
 On the first day we started with a time frame of 2 hours for the whole experiment, so we decided to set a deadline for each question and put a time limit of 1 hour each. Later we expanded the time limit to 1 hour 30 minutes for each question. On the second day we decided to stick with 1 hour each because there was no demand to extend it.
 
-\section{Experiment Results}
+\subsection{Experiment Results}
 
 We can split the experiment analysis in two parts: time and accuracy.
 
-\subsection{Time Analysis}
+\subsection{Time Analysis.}
 
 Time analysis was conducted with R Statistical Software using the inputs\footnote{We provide the inputs we've used in the appendix.} extracted from each experimentation day. We've used the linear model described in Figure 1 that considers the effect of different factors on the response variable similarly to Paola's work \cite{paola}, but we've also added the effect between each replica and the treatment as explained by Sanchez in \cite{sanchez}.
 
@@ -150,7 +150,6 @@ Then we've run the Box-Cox transformation - which is a power transformation - to
 \includegraphics[height=4.3cm, width=6cm]{img/u2boxcox.png}
 \caption{First experiment: before and after box-cox transformation ($\lambda = 5$).}
 \end{figure}
-\\
 
 After applying Box-Cox transformation, we ran Tukey Test of Additivity that checks whether effect model is additive, so we can evaluate whether interaction between factors displayed on the rows and columns of each latin square won't affect significantly the response when the model is additive \cite{box}; thus, considering the following hypothesis:
 
@@ -223,7 +222,7 @@ Residuals        & 6 &  181610625 &   30268438 &         &           &     \\
 
 In the end of this paper, we provide the list of inputs and instructions on how to reproduce these results as attachments.
 
-\subsection{Accuracy Analysis}
+\subsubsection{Accuracy Analysis.}
 
 Once we collected all answers, we manually evaluated each one of them according to the criterias established previously, where each criteria had an associated value between 0 and 1. Then we've ran a script that evaluates the equation we defined before to classify whether an answer was correct or not. Grouping the results in tables, we have Table 4 and Table 5.
 
@@ -263,7 +262,7 @@ The input and the script to generate the tables are available as attachments in 
 
 % TODO: add script and the data used (anonymized) to appendices or put on github and link %
 
-\section{Discussion}
+\subsection{Discussion}
 
 % TODO: review this section, it was written based on older results %
 
@@ -273,11 +272,11 @@ We cannot draw conclusions regarding the improved accuracy on the second group, 
 
 However, we believe that the benefits of deadlock exceptions are beyond helping unexperienced programmers to find deadlocks more precisely. Experienced programmers would still benefit in many cases where the deadlock is not as obvious as in the exercise we've presented. For example, in a more realistic situation, a deadlock can happen in a background thread that doesn't really affect the program execution overall but make the execution lacking some expected behavior. Furthermore, in non-interactive systems where they are only running in background, is nearly impossible to know when there's a problem unless this software is monitored constantly which is very time consuming or the system produces output constantly that is affected by a potential deadlock. If we have a deadlock exception, we can either prepare and handle this exception on the code level, or just have this signal from output that would help developers to fix it later.
 
-\section{Threats To Internal Validity}
+\subsection{Threats To Internal Validity}
 
 In this experiment, we've collected evidence on how the presence of deadlock exception affects student ability to identify deadlocks accurately. However, we must raise a few considerations regarding the validity of our results.
 
-\subsection{Time Measurement}
+\subsubsection{Time Measurement.}
 
 Since we wanted to run the experiment in a homogenous environment, we've decided to run it in a laboratory in Federal University of Pernambuco, and we've provided links to download the exercise and a few instructions explaining how to deploy it. We wanted to make it as easy as possible and before we've started the test, we gave a small presentation reproducing step by step the instructions that would be described on each exercise, so everyone could follow up and make the setup at the same time. Once everyone was done, we've started to count the time and allowed them to run the programs and start debugging. However, this procedure was not enough: there was a few students (approximately 3 in total) who did the setup differently and could not execute the program; therefore, they've lost a few minutes until we've fixed that for them. Since they've lost only a few minutes, we have still counted them as part of the experiment and did not discount the time.
 
@@ -287,7 +286,7 @@ Whenever a student finished a given question, if the time was below the time lim
 
 Also, we believe that our imposed time limit have limited more drastically the time ranges on the first group because they spent more time on each question. Also the fact it was an exam for them may have delayed the time to answer because they were more careful. We have observed during the experiment that many students wrote their answers but they were reluctant to ask for the next question because they still have plenty of time left and they wanted to make sure it was correct. We did not observe such behavior with the second group of students and we believe it is because they did not have the same pressure to deliver correct results as the first group had.
 
-\subsection{Exercises}
+\subsubsection{Exercises.}
 
 We understand that the two questions we've used to evaluate the students are far easier than what most software engineers have to deal with in the real world. However we could not use any real world issue because it would easily take the time limit of the experiement for each bug.
 
@@ -295,11 +294,11 @@ On the other hand, we've created two questions based on real world bugs that we 
 
 Some researchers actually believe that empiric evaluations should not be limited to real projects. Buse claims there are benefits of using non-real artifacts \cite{buse} because it's easier for researchers to translate research questions into successful experiments as it allows a greater control over confouding factors. Otherwise, it would be necessary to turn all participants familiar with the codebase of a real and complex system before even starting the experiment. 
 
-\section{Threats to External Validity}
+\subsection{Threats to External Validity}
 
 Let's consider a few conditions that might limit the generalization power of our findings in this experiment.
 
-\subsection{Students}
+\subsubsection{Students.}
 
 Each student which participated in this experiment had a different background. What we did to minimize the differences was to select groups where students had at least basic experience in concurrent programming and they should be familiarized with the types of bugs such codes can have: the first group of students with undergraduate students attended the class Paradigms of Computaional Languages where deadlocks are covered in classes and exercises; the second group with graduate students attended the class Parallel Programming which covered concurrent programming in low level detail in classes and exercises, including deadlock detection.
 

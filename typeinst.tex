@@ -1,22 +1,8 @@
-  
-%%%%%%%%%%%%%%%%%%%%%%% file typeinst.tex %%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% This is the LaTeX source for the instructions to authors using
-% the LaTeX document class 'llncs.cls' for contributions to
-% the Lecture Notes in Computer Sciences series.
-% http://www.springer.com/lncs       Springer Heidelberg 2006/05/04
-%
-% It may be used as a template for your own input - copy it
-% to a new file with a new name and use it as the basis
-% for your article.
-%
-% NB: the document class 'llncs' has its own and detailed documentation, see
-% ftp://ftp.springer.de/data/pubftp/pub/tex/latex/llncs/latex2e/llncsdoc.pdf
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 \documentclass[runningheads,a4paper]{llncs}
+
+\let\proof\relax
+\let\endproof\relax
 
 \usepackage{amssymb}
 \setcounter{tocdepth}{3}
@@ -34,18 +20,11 @@
 
 \mainmatter  % start of an individual contribution
 
-% first the title is needed
 \title{Deadlocks as Runtime Exceptions}
 
 % a short form should be given in case it is too long for the running head
 \titlerunning{Deadlocks as Runtime Exceptions}
 
-% the name(s) of the author(s) follow(s) next
-%
-% NB: Chinese authors should write their first names(s) in front of
-% their surnames. This ensures that the names appear correctly in
-% the running heads and the author index.
-%
 \author{Rafael Brandao Lobo%
 \and Fernando Castor}
 

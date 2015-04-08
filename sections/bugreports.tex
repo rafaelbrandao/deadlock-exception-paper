@@ -1,32 +1,28 @@
-\chapter{Bug Reports Study}
+\section{Bug Reports Study}
 
 In a previous study \cite{lu}, some interesting pattern about concurrency bugs was found: 30 out ot 31 deadlock cases involved at most two resources, where only one case was triggered by three threads waiting for three resources circularly. After that we also suspected that deadlocks between 2 threads and 2 resources are more common than other resource deadlocks, so we've decided to investigate this observation further with a bigger sample of real-world deadlock bug reports from open-source projects.
 
 In this chapter, we'll present how we have conducted our bug reports study. We can split it in three parts: how we've collected the sample, how we've classified each bug in that sample, and what results we have found.
 
-\section{Sample Collection}
+\subsection{Sample Collection}
 
 We've chosen three open source projects which used Java as main programming language and made use of concurrent programming: Lucene, Eclipse and OpenJDK.
 
 Lucene\footnote{Lucene: http://lucene.apache.org/} is a text search engine library that can be used along many applications, where concurrent programming was used to deliver high performance. Eclipse\footnote{Eclipse: https://eclipse.org/} is one of the most popular IDE for java developers. OpenJDK\footnote{OpenJDK: http://openjdk.java.net/} is an open-source implementation of the Java Platform. These three projects share a few similarities: they're written in Java; they have vast bug report repositories and tools to search for bug reports; development culture of reviews inside bug reports by discussing solutions to fix the problem. In particular, this last point is very important since we need to analyse bug reports and infer their classification.
 
-We have initially searched in each repository for the keyword \emph{deadlock}, and we've collected 541 bug reports in total. Each project had a different bug repository, so we've changed slightly the query parameters to find relevant bug reports.
+We have initially searched in each repository for the keyword \emph{deadlock}, and we've collected 541 bug reports in total. Each project had a different bug repository, so we've changed slightly the query parameters to find relevant bug reports. In Lucene, we've searched for bugs matching the word "deadlock" anywhere in the bug report (i.e. in summary or in comments), related to module "lucene-core" where issue type was set as "bug" and whose status was set as "closed"; from this search, we've found 27 bugs.\footnote{Lucene bug reports: http://goo.gl/DhVI3t}
+In Eclipse, we've searched for the word "deadlock" in summary, where resolution was set as "fixed" and whose status was set as "resolved"; from this search, we've found 406 bugs.\footnote{Eclipse bug reports: http://goo.gl/qQnrEm}
+In OpenJDK, we've searched for bugs with the word "deadlock" inside the summary, related to its module named "JDK", where issue type was "bug", resolution was "fixed" and status was "resolved"; finally, from this search, we've found 108 bugs.\footnote{OpenJDK bug reports: http://goo.gl/xYFfsO}
 
-In Lucene, we've searched for bugs matching the word "deadlock" anywhere in the bug report (i.e. in summary or in comments), in module "lucene-core" with issue type as "bug", where status was "closed". From this search, we've found 27 bugs\footnote{http://goo.gl/DhVI3t}.
+Assuming normal distribution in bug reports population, we've calculated the minimal size of the sample where we could achieve 95\% of confidence level with 5\% sampling error and using response distribution as 50\% to find the biggest sample size. Using these parameters, we've found the minimal size as 225 then we've created a random sample of 225 bugs out of all 541 bugs we've found and then started to label each bug as explained on the next section. In appendix we provide the code we've used to calculate the sample size.
 
-In Eclipse, we've searched for "deadlock" in summary, where resolution was set to "fixed" and status was set to "resolved". From this search, we've found 406 bugs\footnote{http://goo.gl/qQnrEm}.
+\subsection{Data Labeling}
 
-In OpenJDK, we've searched the word "deadlock" in summary, in module "JDK" with issue type as "bug", where resolution was set to "fixed", status was "resolved". From this search, we've found 108 bugs\footnote{http://goo.gl/xYFfsO}.
+We've merged all bug reports of our random sample in one single table. The first field was the name of the bug, each name was composed by a prefix that could be either \emph{LUCENE}, \emph{ECLIPSE} or \emph{JDK}, followed by the bug number inside its own repository. Then we've added a category label field which could be "A", "B", "C" or "D". The category was added after manual inspections based on criterias that we will present next. Furthermore we've added other fields in this table such as \emph{"TYPE"}, \emph{"\# of THREADS"}, \emph{"\# of RESOURCES"} and \emph{"NOTES"}, they'll be described next.
 
-Assuming normal distribution in bug reports population, we've calculated the minimal size of the sample where we could achieve 95\% of confidence level and 5\% sampling error (also setting response distribution to 50\% to find the biggest sample size\footnote{More about 'response distribution' in http://www.raosoft.com/samplesize.html}). We've found minimal size as 225, so we've created a random sample of 225 bugs out of all bugs we've found. In appendix we provide the code we've used to calculate the sample size.
+The final version of this table\footnote{Bug reports sample table: http://goo.gl/zNsIGz} also contains \emph{"TIME (HOURS)"} and \emph{"COMMENTS"} but these were extracted automatically from the bug reports data and we did not use them for the analysis in this work.
 
-\section{Data Labeling}
-
-We've merged all bug reports of our random sample in one single table. The first field was the name of the bug, each name was composed by a prefix that could be either \emph{LUCENE}, \emph{ECLIPSE} or \emph{JDK}, followed by the bug number inside its own repository. Then we've added a category label field which could be "A", "B", "C" or "D". The category was added after manual inspections based on criterias that we will present next. Furthermore we've added other fields in this table such as \emph{"TYPE"}, \emph{"# of THREADS"}, \emph{"# of RESOURCES"} and \emph{"NOTES"}, they'll be described next.
-
-The final version of this table\footnote{http://goo.gl/zNsIGz} also contains \emph{"TIME (HOURS)"} and \emph{"COMMENTS"}, but these were extracted automatically from the bug reports data and we did not use them for this analysis.
-
-\subsection{Field "CATEGORY"}
+\subsubsection{Field "CATEGORY".}
 
 This is one of the most important fields, as we want to be able to identify what kind of deadlock this bug represents, or if it's not even a real deadlock. We have four different values for this field, and they must be one of the following:
 
@@ -46,9 +42,24 @@ Category C is often easy to classify since the bug often explains another kind o
 
 Category D is for all other bugs which could not be classified as either A, B or C.
 
-\subsubsection{Reviewing Protocol:} 
 
-In order to minimize error on our classification, we've created a protocol that every reviewer should follow, which basically describes how data should be analysed for a certain bug. For example, sometimes a bug points to another one as a duplicate, those links should be used if the initial bug is not clear enough. In order to organize how the review is executed, we should roughly follow these steps:
+\subsubsection{Fields "\# of THREADS" and "\# of RESOURCES".}
+
+Whenever possible, the reviewer should state the number of threads and resources involved, even if this is in the category B. If it's unknown how many resources but it is clear how many threads are involved, then only one of them should be filled and the other field should remain blank.
+
+\subsubsection{Field "TYPE".}
+
+This field is just an annotation and it should be used to specify what kinds of resources a certain bug use. For example if there are two threads and they're in a circular deadlock, then this field should be locks/synchronized, or if you are sure that explicit locks were used for both, then just locks is enough, or if only synchronized blocks/methods are involved, then just synchronized.
+
+The symbol + indicates a separation between threads, so for example "locks + wait" means that one thread holds a lock and the other waits". As this may be confusing, an easy replacement would be to use the "notes" field instead and write down what was found about this bug.
+
+\subsubsection{Field "NOTES".}
+
+This field was encouraged to be used specially to remind other reviewers in the future of how the conclusion was made for cases where it was tricky to choose the category.
+
+\subsubsection{Reviewing Guidelines.} 
+
+In order to minimize error on our classification, we've created a set of guidelines that every reviewer should follow, which basically describes how data should be analysed for a certain bug. For example, sometimes a bug points to another one as a duplicate, those links should be used if the initial bug is not clear enough. In order to organize how the review is executed, we should roughly follow these steps:
 
 1. Look at bug title and bug main description (usually the first comment). Sometimes the reporter have an idea of how the bug occurs and which threads are involved, so this is a big help.
 
@@ -62,22 +73,7 @@ In order to minimize error on our classification, we've created a protocol that 
 
 6. Classify this bug in the category D.
 
-
-\subsection{Fields "\# of THREADS" and "\# of RESOURCES"}
-
-Whenever possible, the reviewer should state the number of threads and resources involved, even if this is in the category B. If it's unknown how many resources but it is clear how many threads are involved, then only one of them should be filled and the other field should remain blank.
-
-\subsection{Field "TYPE"}
-
-This field is just an annotation and it should be used to specify what kinds of resources a certain bug use. For example if there are two threads and they're in a circular deadlock, then this field should be locks/synchronized, or if you are sure that explicit locks were used for both, then just locks is enough, or if only synchronized blocks/methods are involved, then just synchronized.
-
-The symbol + indicates a separation between threads, so for example "locks + wait" means that one thread holds a lock and the other waits". As this may be confusing, an easy replacement would be to use the "notes" field instead and write down what was found about this bug.
-
-\subsection{Field "NOTES"}
-
-This field was encouraged to be used specially to remind other reviewers in the future of how the conclusion was made for cases where it was tricky to choose the category.
-
-\section{Results Analysis}
+\subsection{Results Analysis}
 
 As we want to understand how many resource deadlock bugs did involve 2 threads and 2 resources, we discard bugs in B and C category because they're not resource deadlocks. What we have left are the bugs we could not determine its category. In the worse case scenario, all bugs in category D should be resource deadlocks which would involve something different than 2 threads and 2 resources, given by the following equation:
 
@@ -130,9 +126,29 @@ bugs\_ratio = \frac{ [ bugs(A, threads=2, resources=2) = 134 ] }{ [bugs(A) = 146
 
 Running the same equation again with the new values, \textbf{we estimate that 91.7\% of resource deadlocks should be classic deadlocks if we could predict bug categories in D}.
 
-\section{Findings}
+\subsection{Threats to Internal Validity}
 
-As we've highlighted in the previous section, classic deadlocks are by far the most popular type of resource deadlocks; also, resource deadlocks are more popular than communication deadlocks. This gives us evidence that if we can solve the problem of deadlock detection for the classical case, that is, between 2 threads and 2 locks, we can cover most of the bugs.
+Although we've created a set of guidelines that all reviewers should follow with the hope that we would have more than one reviewer available on this research,
+in reality we couldn't have more than one reviewer to execute the labeling on all bug reports due to constraints on time and resources. There is both an advantage
+and a disadvantage on top of this limitation. The advantage is that it is easier to guarantee that all bug reports were reviewed following the exact same set of rules
+as they were all reviewed by the same person. The disadvantage, however, is that there was no second reviewer to double check if the labels
+were indeed coherent to their respective bug reports.
+
+\subsection{Threats to External Validity}
+
+One factor that might limit generalization of these findings is that we've looked at only three different open-source projects written mostly in Java.
+In the real world, software is written in many different languages, where each language can potentially have a different distribution of deadlock bugs.
+As we've implemented deadlock exceptions in Java's ReentrantLock, we wanted to focus on what kind of deadlock bugs developers usually face when developing with Java.
+
+For that purpose, we've carefully chosen popular open-source projects that represent high quality software and contain well established open source communities.
+Their repositories had a rich resource of bug reports with many comments and documents that actually helped us to label each bug individually and they provided
+online tools to allow us to search into their bug report archives which was essential for this study.
+We believe that these projects were representative to evaluate the distribution of deadlock bugs for software written in Java.
+We suspect this is also true for other popular languages but we leave it open for future work.
+
+\subsection{Discussion}
+
+As we've highlighted in the previous sections, classic deadlocks are by far the most popular type of resource deadlocks; also, resource deadlocks are more popular than communication deadlocks. This gives us evidence that if we can solve the problem of deadlock detection for the classical case, that is, between 2 threads and 2 locks, we can cover most of the bugs.
 
 We believe that giving developers a signal that something is wrong in the code (i.e. an exception) is much more powerful than showing nothing (as it happens today). Exceptions provide an easy framework to reason about potential issues in the code and makes easier to handle bugs once they were detected. And even if the bug is not handled, it still gives a signal to developers that something is wrong and should be fixed.
 

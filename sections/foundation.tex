@@ -1,8 +1,8 @@
-\chapter{Foundation}
+\section{Foundation}
 
 In this chapter, we will cover the basic concepts and previous studies related to deadlock detection. We're going to to start by covering topics such as static analysis, dynamic analysis and hibrid analysis, citing previous studies that contributed into those categories.
 
-\section{Static analysis}
+\subsection{Static analysis}
 
 Static analysis techniques verify source code from a program and try to identify potential problems present in the code without even executing it.
 For deadlock detection, they generally attempt to detect cyclic relationships of resource acquisition between threads where each cycle represents a possible deadlock.
@@ -22,7 +22,7 @@ and does not have real users, thus obtaining suitable subject programs to do any
 represent concurrent programming styles that occur in practice, but at least for most of the subject programs analysed, deadlock-freedom could be demonstrated
 without any programmer intervention.
 
-\section{Dynamic analysis}
+\subsection{Dynamic analysis}
 
 Dynamic analysis finds potential deadlock cycles from an execution trace of a program which makes them often more scalable and precise than static analysis.
 However, due to the sizes of large-scale programs, the probability that a given run will show a thread acquiring a lock at the right time to trigger a deadlock for
@@ -96,7 +96,7 @@ standard memory management library calls, which incurs little overhead. Then at 
 a memory-related environmental change instructed by the control unit. Its evaluations shows that it recovered from software failure in about 0.16 seconds which was
 significantly better compared to what was done before (web application restart).
 
-\section{Hybrid analysis}
+\subsection{Hybrid analysis}
 
 It is also possible to mix both static analysis and dynamic analysis in an hybrid analysis to take advantage of both types and boost performance during runtime.
 Some techniques deploy static analysis to infer deadlock types and dynamic analysis for the parts of the program that could not be analysed in the first part,
@@ -143,23 +143,28 @@ deadlocks automatically, but they don't work if certain operations happen inside
 to the type of application (such as webservers or databases) and they are not easily translated into other application types efficiently.
 
 Building deadlock-free programs is an old challenge.
-Concurrent Pascal \bibitem{hansen} was presented in 1975 as a language with a compile-time deadlock detection built-in. It had several
+Concurrent Pascal \cite{hansen} was presented in 1975 as a language with a compile-time deadlock detection built-in. It had several
 limitations such as fixed amount of processes and recursive functions not allowed, but then it could process a partial ordering
 of process interactions and prove certain system properties such as absence of deadlocks during compilation.
 
 In modern languages and databases systems, deadlocks are nothing but bugs, and they have exceptions in few special cases.
 Database deadlocks are typically detected within database engines at runtime \cite{grechanik} raising deadlock exceptions and rolling back transactions
-involved in the circular wait. Haskell programming language throws deadlock exceptions when garbage collector detects a thread as unreachable \footnote{http://goo.gl/v09kqn}
+involved in the circular wait. Haskell programming language throws deadlock exceptions when garbage collector detects a thread as unreachable\footnote{http://goo.gl/v09kqn}
 and no other thread can wake it up. Another programming language, Go, throws deadlock exception when all \emph{goroutines} are blocked waiting on their message channel\footnote{http://guzalexander.com/2013/12/06/golang-channels-tutorial.html}.
 
-We believe that deadlock exceptions are useful in many ways. They inform when there's something obviously wrong in the code rather than just not showing anything,
-like deadlocks usually do. For non-interactive systems, it is even more difficult to find a deadlock when it happens: Pie at all \cite{ian} discuss how difficult it
-was to identify one of the concurrency bugs by giving an example of a classical deadlock (two threads circularly waiting each other) that did not
-broke its application completely but instead avoided an intended behaviour to happen which was really hard to debug and figure out where the problem was.
+We believe the presence of deadlock exceptions in programming languages are very useful specially when it's guaranteed to be fired and programmers can rely upon it.
+The main advantage is that they inform there's something unexpectedly wrong in the code which allows programmers to identify the problem easier and potentially fix it faster.
+Furthermore if the exception is guaranteed to be fired then programmers can have specialized code to run when it happens.
 
-Deadlock exceptions could also be used in the code to run specialized recovery operations designed by the developers when such operations are indeed necessary.
-We think it's better than relying on auto-recovery algorithms that can be provided in some other deadlock detection approaches because they are, in general,
-very innefficient, covering real bugs and turning application's performance a lot worse in exchange.
+For instance, a deadlock exception could be handled in the code to trigger some deadlock recovery mechanism specialized for that case, if it is indeed necessary.
+This approach has an advantage on its own because it does not rely on any auto-recovery mechanism as seen in some previous deadlock detection algorithms,
+because they were in general very inneficient. Thus, automatically recovering from deadlocks could potentially cover real bugs that needs to be fixed immediately
+and also turn application's performance a lot worse in exchange.
+
+In non-interactive systems, there's a huge benefit of having deadlock exceptions in the programming language.
+Currently, it is very difficult to find a deadlock when it happens but it's a lot harder when the system is not monitored constantly, as non-interactive systems usually are.
+In Pie at all's paper \cite{ian}, it is discussed how difficult it was to identify one of the concurrency bugs which was just a classical deadlock (two threads circularly waiting each other). However, the deadlock did not leave the application completely stuck, but instead an intended behaviour in a specific case did not happen because of this hidden deadlock
+which made the problem very hard to debug and be identified.
 
 We want to solve this problem by extending programming languages to support deadlock exceptions. We believe they can help developers to find and fix their mistakes
 in the code when they have such exception. However we want to solve this problem efficiently too, then we decided to focus on the most common type of deadlock:

@@ -1,4 +1,4 @@
-\chapter{Introduction}
+\section{Introduction}
 
 Real-world applications use concurrency to parallelize computation in multiple threads or processes, taking more advantage of multicore processors.
 However concurrenct code is difficult to write correctly, as it is well documented in \cite{lu}. In a concurrent code, for example, a developer must
@@ -35,11 +35,11 @@ In this study, however, we are focusing on solving deadlocks differently. We bel
 
 There are some programming languages such as Haskell and Go that already contain some kind of deadlock exception for very particular cases. In this study, the proposed deadlock exception was focused on what we've found out to be the most common type of deadlock: the classical deadlock illustrated in the previous example where only two threads are involved and they're waiting circularly for two resources.
 
-\section{Summary of Goals}
+\subsection{Summary of Goals}
 
 In this work we have the main goal to show how deadlock detection between two threads and two locks can be implemented with very low runtime overhead and evaluate the impact of deadlock exceptions on the efficiency of identifying deadlocks in software by running an empirical study with students. With this contribution, we seek to understand the benefits of such exceptions in programming languages and also offer a lightweight implementation of deadlock exceptions that can seamlessly run on top of Java OpenJDK.
 
-\section{Outline}
+\subsection{Outline}
 
 The remainder of this work will be organized as follows:
 
