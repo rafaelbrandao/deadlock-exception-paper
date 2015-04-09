@@ -1,8 +1,8 @@
 \section{Foundation}
 
-In this chapter, we will cover the basic concepts and previous studies related to deadlock detection. We're going to to start by covering topics such as static analysis, dynamic analysis and hibrid analysis, citing previous studies that contributed into those categories.
+In this section, we will cover the basic concepts and previous studies related to deadlock detection. We're going to to start by covering topics such as static analysis, dynamic analysis and hibrid analysis, citing previous studies that contributed into those categories.
 
-\subsection{Static analysis}
+\subsection{Static Analysis}
 
 Static analysis techniques verify source code from a program and try to identify potential problems present in the code without even executing it.
 For deadlock detection, they generally attempt to detect cyclic relationships of resource acquisition between threads where each cycle represents a possible deadlock.
@@ -22,7 +22,7 @@ and does not have real users, thus obtaining suitable subject programs to do any
 represent concurrent programming styles that occur in practice, but at least for most of the subject programs analysed, deadlock-freedom could be demonstrated
 without any programmer intervention.
 
-\subsection{Dynamic analysis}
+\subsection{Dynamic Analysis}
 
 Dynamic analysis finds potential deadlock cycles from an execution trace of a program which makes them often more scalable and precise than static analysis.
 However, due to the sizes of large-scale programs, the probability that a given run will show a thread acquiring a lock at the right time to trigger a deadlock for
@@ -96,7 +96,7 @@ standard memory management library calls, which incurs little overhead. Then at 
 a memory-related environmental change instructed by the control unit. Its evaluations shows that it recovered from software failure in about 0.16 seconds which was
 significantly better compared to what was done before (web application restart).
 
-\subsection{Hybrid analysis}
+\subsection{Hybrid Analysis}
 
 It is also possible to mix both static analysis and dynamic analysis in an hybrid analysis to take advantage of both types and boost performance during runtime.
 Some techniques deploy static analysis to infer deadlock types and dynamic analysis for the parts of the program that could not be analysed in the first part,

@@ -108,16 +108,15 @@ thus leaving their references behind for others to cleanup (as in \emph{item 4})
 
 \subsection{Implementation}
 
-In this subsection we present pseudocode for the proposed protocols. We attach in the appendix pseudocode for the current implementation of \emph{ReentrantLock} which we will not focus here. Instead, we will look into what changes were done on top of that implementation to follow the protocols covered previously. The actual code can be found on our github repository.
+In this subsection we present pseudocode for the proposed protocols. We attach in the appendix pseudocode for the current implementation of \emph{ReentrantLock} which we will not focus here. Instead, we will look into what changes were done on top of that implementation to follow the protocols covered previously. The actual code can be found on our github repository \cite{repo}.
 
-%TODO: put code on github and reference%
 \medskip
 \noindent
 {\it Changes on ReentrantLock: keep ownedLocks list updated}
 \begin{verbatim}
 // This is a thread-local inside a lock.
 // Each thread keeps the list of locks they own.
-DEFINE_PER_THREAD(vector<Lock>, ownedLocks);
+DEFINE_PER_THREAD(List<Lock>, ownedLocks);
 
 // As soon as a lock is acquired or release, this function is called.
 // Based on that, we call register or unregister owned lock.
@@ -171,7 +170,7 @@ Next step is to guarantee that both threads will receive the deadlock exception.
 \begin{verbatim}
 // Each lock will have a list of threads that are not allowed to
 // acquire this lock (if it happens, throw exception).
-DEFINE_PER_LOCK(vector<Thread>, taintedThreads);
+DEFINE_PER_LOCK(List<Thread>, taintedThreads);
 
 void park() {
   Thread conflictingThread = owner;
@@ -216,24 +215,22 @@ The solution to force the second thread to also throw an exception was to observ
 is already stuck waiting for the first thread. Also, the first thread is still the owner of the current lock object allowing it to modify the list of tainted threads inside that lock.
 Then it updates tainted threads list by adding the second thread on it. Next time the second thread acquires this lock, it will throw an exception too.
 
-There's a small disadvantage of this final solution which is a leak of Thread references on taintedThreads objects on each lock. It can happen when both threads
+There's a small disadvantage of this final solution which is a leak of Thread references on taintedThreads objects for each lock. It can happen when both threads
 simultaneously detect the deadlock and both throw exceptions. In this case, they would have added the opposite thread inside their own lock's taintedThreads list, but afterwards
 both threads would stop and none of them would attempt to acquire the opposite lock again. We've minimized the effect of this leak by also removing non-active thread
 references from taintedThreads list every time any update is done on this list, so in practice other threads would eventually clean up them. The code which minimizes this
-leak is available on our repository, but for the sake of brevity we've not included it here.
+leak is available on our repository \cite{repo}, but for the sake of brevity we've not included it here.
 
-% TODO add github url %
-
-\subsection{Performance Evaluation}
+\subsection{Performance}
 
 We've also did a quick performance evaluation between our implementation of ReentrantLock, the original ReentrantLock and Eclipse's OrderedLock implementation \cite{orderedlock}
 in a synthetic benchmark we've created. All code related to this evaluation and its results are available in our repository as well.
 
-OrderedLock is a deadlock-safe implementation of lock on top of Eclipse's architecture. When a deadlock happens, OrderedLock releases all locks by a given thread and suspends it, consequently allowing other threads to proceed; later, the suspended thread will acquire locks again. It works differently from usual locks because it allows threads to give up
-temporarily of locks and this remove the feature of exclusive access between acquire and release of a lock. We've modified OrderedLock to work independently from Eclipse and we
-provide its source code on our repository.
+OrderedLock is a deadlock-safe implementation of a lock which relies on Eclipse's code architecture. When a deadlock happens, it releases all locks by a given thread and suspends it, consequently allowing other threads to proceed; later, the suspended thread will acquire such locks again. It works differently from usual locks because it allows threads to give up
+temporarily of all its owned locks and this consequently removes exclusive access properties between acquire and release of a lock (also known as \emph{critical zones}). In order to use it outside of Eclipse we had to do some small code changes removing only what was Eclipse specific code. We've used this modified OrderedLock on this evaluation and we
+provide its source code on our repository along with this benchmark \cite{repo}.
 
-The synthetic benchmark consisted on a series of $N$ threads incrementing 10 counters where each counter was protected by explicit locks and each thread must increment its corresponding counter 1000 times. Higher values for $N$ means higher contention: more threads will compete against each other for a particular counter. None of these increments will generate a deadlock, thus what we are evaluating in this benchmark is the overhead of deadlock detection checks in normal operations that do not lead to a deadlock. The measurements were made on a linux system with Intel\textsuperscript{\textregistered} CoreTM i7­ 3632QM Processor (6Mb Cache, 2.2GHz) and each cell result in the table below was calculated after executing 70 times the test with the same properties but only showing the average of the last 50 executions.
+The synthetic benchmark consisted on a series of $N$ threads incrementing 10 counters where each increment in a counter was protected by explicit locks. Each thread would have to increment its pre-defined counter 1000 times before finishing its execution and each counter is evenly assigned across many threads in such a way that each counter will have exactly $N / 10$ threads incrementing itself; thus, higher values of $N$ results in higher contention, that is, more threads will compete against each other for a particular counter. However, none of these increments will generate a deadlock which allow us to evaluate in this benchmark the amount of overhead caused by our deadlock detection algorithm checks when no deadlock actually happens. The measurements were made on a linux system with Intel\textsuperscript{\textregistered} CoreTM i7­ 3632QM Processor (6Mb Cache, 2.2GHz) and each cell result presented in the table below was calculated after executing 70 times the same test with the same properties but only showing the average of the last 50 executions.
 
 \begin{table}
 \begin{center}
@@ -251,5 +248,7 @@ The synthetic benchmark consisted on a series of $N$ threads incrementing 10 cou
 \end{center}
 \end{table}
 
-The difference of results between our implementation and the original ReentrantLock was between 50-90\%. Meanwhile, OrderedLock performed a lot worse, reaching about 8446.3\% increase in time for the worse case. We believe these are great results for our implementation and also suspect that it may become even faster if these changes are applied directly to OpenJDK and then recompiled, allowing the default ReentrantLock to throw exception. However, a more detailed performance evaluation will be left for future work.
+The difference of results between our implementation and the original ReentrantLock gives a range of increased time from about 50\% to 90\%. Meanwhile, OrderedLock performed a lot worse, reaching about 8446.3\% increase in time for the worse case. We believe these are great results for our implementation and also suspect that it may become even faster if these changes are applied directly to OpenJDK and then recompiled, allowing the default ReentrantLock to throw exception. However, a more detailed performance evaluation will be left for future work. Realistically this benchmark does not reflect how real world software would be impacted when using a certain lock, but it gives a sense of how expensive to make changes to Java's highly optimized ReentrantLock.
+
+Even though our ReentrantLock implementation performs worse than the original code, we believe the impact was minimum and the benefits of deadlock detection are still worth. On the next section we present our usability evaluation to measure these benefits. 
 

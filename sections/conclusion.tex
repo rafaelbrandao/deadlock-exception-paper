@@ -1,0 +1,30 @@
+\section{Future Work}
+
+As a proposal for future work, runtime exception should also be added to synchronized blocks in Java while trying to maintain runtime overhead as low as possible.
+That way, it would allow easier integration with existing software as many programmers prefer to use synchronized blocks instead of explicit locks,
+and also it would be possible to do a better performance impact analysis using real world applications instead of synthetic benchmarks.
+
+Another idea is to push these changes to Java's \emph{ReentrantLock} forward and add native support for DeadlockException in Java JDK,
+but some optimization in our algorithm might be needed as well to reduce even more the runtime overhead as we've seen in our benchmark in this work.
+
+\section{Conclusion}
+
+In this work, we've initially discussed how challenging it is to handle deadlocks and resolve them in real world software, and present many previous approaches that
+have tried to identify or solve deadlocks with either static analysis, dynamic analysis or a mix of the two approaches.
+
+Given that it's very costly to detect deadlocks in its general form, we've investigated which kind of deadlock is the most popular by looking at actual bug reports
+in relevant open source projects and classifying each deadlock manually. We've confirmed a previous study claim that classic deadlocks between two threads and two resources
+are the most frequent case of deadlock. This claim allowed us to focus on this specific case instead and minimally modify Java's \emph{ReentrantLock} to provide a lightweight
+version of a lock that detects this kind of deadlock in runtime.
+
+However, differently from previous approaches, we provided a runtime exception which should be raised on both threads involved in a classic deadlock
+when our Java's \emph{ReentrantLock} implementation is used, as we believe that developers would find bugs faster if deadlocks were just exceptions.
+
+Our usability evaluation with students shows that the presence of deadlock exception indeed reduce the amount of time spent to identify a bug in a code they were not familiar with. It also shows that less experienced students could identify the source of the deadlock correctly more easily, and we believe these results are very promising.
+
+Finally, we summarize our main contributions in this work as follows:
+\begin{enumerate}
+\item Found evidence that classic deadlocks are the most popular type of deadlock (92.07\% of all resource deadlocks we've identified);
+\item Provided an implementation of reentrant lock that detects classic deadlocks and throw runtime exception on both threads, preceded by a sketch of a proof that shows why this detection algorithm works;
+\item Found evidence that deadlock exception reduces time to identify problems and can also improve the ability to identify deadlocks correctly for less experienced developers.
+\end{enumerate}
