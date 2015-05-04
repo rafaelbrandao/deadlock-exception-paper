@@ -1,0 +1,51 @@
+
+\documentclass[runningheads,a4paper]{llncs}
+
+\let\proof\relax
+\let\endproof\relax
+
+\usepackage{amssymb}
+\setcounter{tocdepth}{3}
+\usepackage{graphicx}
+\usepackage{subfig}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{url}
+\newcommand{\keywords}[1]{\par\addvspace\baselineskip
+\noindent\keywordname\enspace\ignorespaces#1}
+\usepackage{pifont}
+\usepackage[utf8]{inputenc}
+\inputencoding{utf8}
+
+\begin{document}
+
+\mainmatter
+
+\title{Deadlocks as Runtime Exceptions}
+\titlerunning{Deadlocks as Runtime Exceptions}
+
+\author{Rafael Brandao Lobo%
+\and Fernando Jose Castor de Lima Filho}
+
+\authorrunning{Deadlocks as Runtime Exceptions}
+
+\institute{Center of Informatics, Federal\\
+University of Pernambuco, Brazil\\
+\{rbl,castor\}@cin.ufpe.br\\
+\url{http://www.cin.ufpe.br/}}
+
+\toctitle{Deadlocks as Runtime Exceptions}
+\tocauthor{Deadlocks as Runtime Exceptions}
+\maketitle
+
+\input{sections/abstract}
+%\input{sections/intro}
+%\input{sections/foundation}
+\input{sections/bugreports}
+\input{sections/proof}
+\input{sections/evaluation}
+%\input{sections/conclusion}
+\input{sections/bib}
+%\input{sections/appendices}
+
+\end{document}

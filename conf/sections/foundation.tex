@@ -1,0 +1,173 @@
+\section{Foundation}
+
+In this section, we will cover the basic concepts and previous studies related to deadlock detection. We're going to to start by covering topics such as static analysis, dynamic analysis and hibrid analysis, citing previous studies that contributed into those categories.
+
+\subsection{Static Analysis}
+
+Static analysis techniques verify source code from a program and try to identify potential problems present in the code without even executing it.
+For deadlock detection, they generally attempt to detect cyclic relationships of resource acquisition between threads where each cycle represents a possible deadlock.
+Many static analysis approaches were proposed over the past decade \cite{dawson}\cite{chand}\cite{vivek}\cite{praun}\cite{cormac}\cite{williams}
+but in general they suffer of signficant amount of false positives being reported as there may exist deadlock cycles that are just impossible to happen during execution.
+Also, some deadlocks cannot be detected when the language is weakly typed, such as C/C++.
+
+Recently, Marino et al. \cite{marino} proposed a static analysis technique to detect potential deadlocks in programs that
+used an extension of Java called AJ that implements atomic sets for class fields as an abstraction of locks to prevent data races
+and atomicity violations by construction. Its declarative nature allows the algorithm to infer which locks each thread may acquire and
+compute a partial order for those atomic sets which would also be consistent with lock acquisition order.
+If such order was detected, the program was guaranteed to be deadlock-free, otherwise possible deadlock would be reported.
+It was implemented as extension of their existing AJ-to-Java compiler and synchronization annotations were given as special Java comments in the code.
+These comments would be parsed and given to the type checker to execute the deadlock analysis. AJ source code would be translated to Java and written into a separated project
+with the transformed code which would later be compiled into bytecode and executed by JVM. A limitation of this approach is that AJ is a research language
+and does not have real users, thus obtaining suitable subject programs to do any evaluation was difficult, and their chosen projects to evaluate might not
+represent concurrent programming styles that occur in practice, but at least for most of the subject programs analysed, deadlock-freedom could be demonstrated
+without any programmer intervention.
+
+\subsection{Dynamic Analysis}
+
+Dynamic analysis finds potential deadlock cycles from an execution trace of a program which makes them often more scalable and precise than static analysis.
+However, due to the sizes of large-scale programs, the probability that a given run will show a thread acquiring a lock at the right time to trigger a deadlock for
+each potential deadlock present in the code is very low, which poses a challenge for dynamic deadlock detection tools. Thus if a given run does not identify potential
+deadlocks, it does not mean the program is free from deadlocks either. Another disadvantage of dynamic analysis is that they often incur runtime overhead and most techniques
+can't be applied in real-world applications for lack of scalability.
+
+Zuo et al. \cite{mcsdk} present a dynamic deadlock detection tool called MulticoreSDK which consists of two phases.
+In the first phase, the algorithm works offline by examining a single execution trace obtained after an instrumented program finishes its execution,
+creating a lightweight lock graph based on program locations of lock events and identifying locks that may be deadlock-related in this graph by checking cycles on it.
+Second phase consists of examining the execution trace and constructing a filtered lock graph based on the lock id of each lock event, analysing only deadlock-related locks
+found in the first phase. Each cycle found in this final graph is reported as potential deadlock in the program.
+It works for java programs and its instrumentation is done by deploying a bytecode instrumentation technique \cite{tanter} to insert extra bytecode
+around instructions such as \emph{monitorenter} and \emph{monitorexit} which would record the thread and the id of lock objects, also around methods lock and unlock of
+\emph{Lock} interface in java.util.concurrent package and enter/exit of synchronized methods.
+Although the algorithm requires to pass over the program trace twice, most of its performance overhead is consumed in the deadlock analysis itself.
+When compared with a traditional approach \cite{contest}, MulticoreSDK has a very small performance gain in analysis time on small applications while memory consumption
+was reduced by about half; meanwhile, for large applications, about 33\% performance gain was reached, consuming about 10 times less memory.
+
+Cai et al. \cite{magicfuzzer} present a dynamic analysis technique known as MagicFuzzer which consists of three phases.
+First phase consists of critical events such as a thread creation or lock acquisition and release being monitored in a running program to generate
+a log of series of lock dependencies which can be viewed as a lock dependency relationship.
+On the second phase, the algorithm classifies such relations in a cyclic-set which contains all the locks that may occur in any
+potential deadlock cycles found in a given execution.
+Then it constructs a set of thread-specific lock-dependency relations based on the locks inside that cyclic-set which is finally tranversed to find potential deadlock cycles.
+On the third phase, all deadlock cycles found in second phase are used as input to the program execution,
+and it is actively re-executed to observe if any further execution will trigger any of those
+potential deadlock cycles in the input, reporting the deadlocks whenever they occur, until all deadlocks are found or the limit of times to re-execute is reached.
+One of its key differences is the presence of an active random scheduler to check against a set of deadlock cycles
+which is said to improve the likehood that a match between a cycle and an execution will be found, but its proof is left open to future work.
+It was implemented using a dynamic instrumentation analysis tool known as Pin 2.9 \cite{pin} which only works for C/C++ programs that use Pthreads libraries on a Linux System.
+It was tested on large-scale C/C++ programs such as \emph{MySQL} \cite{mysql}, \emph{Firefox} \cite{firefox} and \emph{Chromium} \cite{chromium},
+and for some of them, the test would simple start the program and then close it when the interface appeared, while other programs used test cases adopted
+from bug reports in their own repositories. After evaluating the results of tests, it was concluded that it could run efficiently with low memory consumption
+if compared to similar techniques, like MulticoreSDK \cite{mcsdk}.
+
+Pyla et al. \cite{sammati} presents Sammati as a dynamic analysis tool which is capable of detecting deadlocks automatically and
+recovering for any threaded application that use the pthreads interface without any code changes, transparently detecting and resolving deadlocks.
+It is implemented as a library that overloads the standard pthreads interface and turn locks into a deadlock-free operation.
+By associating memory accesses with locks and specifying ownership of memory updates within a critical section to a set of locks,
+it makes memory updates to be only visible outside of the critical section when all parent locks are released.
+When a deadlock is detected, one of the threads involved in the deadlock is
+chosen as a victim and rolled back to the point of acquisition of the offending lock, discarding memory updates done.
+This way it would be safe to restart the code that runs into that critical section again because the memory updates never
+were made visible outside of the critical section. Differently from transactional memory systems,
+its performance impact is minimized because its runtime privatizes memory at page granularity instead of instrumenting
+individual load/store operations. Containment for threaded codes was implemented with a technique described in \cite{berger}:
+if each thread had its own virtual address space, such as most recent UNIX operating systems,
+privatization can be implemented efficiently in a runtime environment where threads are converted to \emph{cords} which is a single threaded process.
+In this algorithm, threads are converted to cords transparently, and since all cords share a global address space, the deadlock detection algorithm
+has access to the holding and waiting sets of each cord and the deadlock detection can be performed at the time a lock is acquired.
+Its detection algorithm uses a global hash table that associates locks being held with its owning cord, another hash table to associate a cord with a lock it is waiting on and a
+queue per cord of locks acquired. Its deadlock detection complexity is linear and has upper bound of $\mathcal{O}$(n) where n is the number of threads.
+However, rollback of acquired locks and all its related memory changes adds a high runtime overhead, given the high costs related to its address space protection
+and privatization logic. Also, there are some limitations in what kind of memory can be recovered in a rollback, like
+non-idompotent actions (i.e. I/O, semaphores, condition signals, etc.) and shared libraries state \cite{pyla}.
+Part of these limitations were addressed with Serenity \emph{serenity}, like serializing some disk I/O operations within critical sessions,
+and it will be discussed further in the next section.
+
+Qin et al. \cite{rx} proposes a dynamic approach called Rx that rolls back a server application once a bug occurs to a checkpoint,
+trying to modify the server environment on its re-execution. In that study, bugs are treated as "allergies" and different program executions
+could either have the "allergen" or not. In the context of concurrency bugs such as deadlocks, as timing is essential for deadlocks to manifest,
+a retry of the server request that caused a deadlock could be enough to get rid of the deadlock.
+It works by dynamically changing the execution environment based on the failure symptoms, and then
+executing again the same code region that contained the bug, but now in the new environment.
+If the re-execution successfully pass through the problematic period,
+all environment changes are disabled thus time and space overheads are avoided.
+Intercept of memory-related library calls (i.e. \emph{malloc()}, \emph{realloc()}, etc.) was implemented on a memory wrapper
+in order to provide environmental changes. During normal execution, it will simply invoke the corresponding
+standard memory management library calls, which incurs little overhead. Then at re-execution phase (called \emph{recovery} mode), the memory wrapper would activate
+a memory-related environmental change instructed by the control unit. Its evaluations shows that it recovered from software failure in about 0.16 seconds which was
+significantly better compared to what was done before (web application restart).
+
+\subsection{Hybrid Analysis}
+
+It is also possible to mix both static analysis and dynamic analysis in an hybrid analysis to take advantage of both types and boost performance during runtime.
+Some techniques deploy static analysis to infer deadlock types and dynamic analysis for the parts of the program that could not be analysed in the first part,
+reducing the overhead caused by dynamic analysis drastically.
+
+Grechanik et al. \cite{grechanik} proposes REDACT that would statically detect all hold-and-wait cycles among resources in SQL statements
+and prevent database deadlocks dynamically by running a supervisory program to intercept transactions sent by applications to databases.
+Once a potential deadlock is detected, the conflicting transaction is delayed which results on breaking the deadlock cycle.
+As database deadlocks may degrade performance significantly, it tries to prevent them of happening.
+An static analysis is executed at compile time and later used at runtime, allowing its deadlock detection algorithm to just make simple lookup
+in the hold-and-wait cycles already detected in compile time, improving deadlock detection performance compared to similar techniques.
+In the first step, some manual-effort is required on every application to build all database transactions used in the application,
+which allows static analysis phase to begin. Its results are parsed and used to generate hold-and-wait cycles necessary by the runtime detection algorithm.
+The dynamic phase is responsible to prevent database deadlocks automatically. It adds interceptors in the application with callbacks associated with particular events and
+instead of sending SQL statements from application to the database, they divert the statements to the supervisory controller whose goal is to quickly analyse if
+hold-and-wait cycles are present in the SQL statements that are in the execution queue. If no hold-and-wait cycle is present, then it forwards these statements to the
+database for execution normally. Otherwise, it holds back one SQL statement while allowing others to proceed,
+and once these statements are executed and results are sent back to applications,
+the held back statement is finally executed by the database.
+Some of its limitations include that not all hold-and-wait cycles detected in the static analysis will actually lead to database deadlocks, so false positives are still possible.
+Databases are highly optimized against deadlocks, so even though some obvious deadlock should happen in theory, in practice they would be prevented by the database itself, but
+this approach will handle such cases as if a deadlock would happen anyway and consequently imposes an overhead in addition to some reduction in the level of parallelism in applications.
+Also, when the static analysis produces too many false positives of hold-and-wait cycles, there is a significant performance overhead overall.
+
+Pyla et al. presents Serenity \cite{serenity} as a sucessor of Sammati \cite{sammati} to handle some previous limitations by mixing some runtime analysis with
+its previous runtime approach, so they share many similarities.
+Program analysis and compile time instrumentation were used in Serenity to guide runtime and efficiently achieve memory isolation with
+some static analysis techniques to infer the scope of a lock and using selective compile time instrumentation on those identified scopes.
+In order to handle some previous I/O limitations, Serenity serializes disk I/O operations performed within critical sections and marks
+threads that performed some of these operations.
+When a deadlock is detected, differently from \cite{sammati}, it will choose as victim a thread that did not perform I/O inside any lock context.
+It also tracks all disk I/O primitives (i.e. read, write, etc.) and all thread creation/termination primitives (i.e. fork, clone,
+etc.) as I/O operations to verify whether such operations were performed within a lock context.
+The new approach also has its own limitations, as it cannot recover from certain deadlocks such as arbitrary I/O within the context of a restartable critical section \cite{pyla}.
+It also requires some programmer input if lock/unlock operations are encapsulated in functions/classes,
+so they should be explicitly identified by the developer before running its compile time analysis.
+Furthermore, recompiliation is now necessary for application and all its external dependencies (i.e. shared libraries) in order to also instrument them.
+
+\subsection{Deadlocks as Exceptions}
+
+Deadlock detection or recovery algorithms are not always as efficient or reliable as they should be, as we've seen in the previous sections.
+Some techniques generates false positives as deadlocks candidates, other techniques imposes high runtime overhead. Some also offer recovery from
+deadlocks automatically, but they don't work if certain operations happen inside critical sections. Finally, some techniques are too specific
+to the type of application (such as webservers or databases) and they are not easily translated into other application types efficiently.
+
+Building deadlock-free programs is an old challenge.
+Concurrent Pascal \cite{hansen} was presented in 1975 as a language with a compile-time deadlock detection built-in. It had several
+limitations such as fixed amount of processes and recursive functions not allowed, but then it could process a partial ordering
+of process interactions and prove certain system properties such as absence of deadlocks during compilation.
+
+In modern languages and databases systems, deadlocks are nothing but bugs, and they have exceptions in few special cases.
+Database deadlocks are typically detected within database engines at runtime \cite{grechanik} raising deadlock exceptions and rolling back transactions
+involved in the circular wait. Haskell programming language throws deadlock exceptions when garbage collector detects a thread as unreachable\footnote{http://goo.gl/v09kqn}
+and no other thread can wake it up. Another programming language, Go, throws deadlock exception when all \emph{goroutines} are blocked waiting on their message channel\footnote{http://guzalexander.com/2013/12/06/golang-channels-tutorial.html}.
+
+We believe the presence of deadlock exceptions in programming languages are very useful specially when it's guaranteed to be fired and programmers can rely upon it.
+The main advantage is that they inform there's something unexpectedly wrong in the code which allows programmers to identify the problem easier and potentially fix it faster.
+Furthermore if the exception is guaranteed to be fired then programmers can have specialized code to run when it happens.
+
+For instance, a deadlock exception could be handled in the code to trigger some deadlock recovery mechanism specialized for that case, if it is indeed necessary.
+This approach has an advantage on its own because it does not rely on any auto-recovery mechanism as seen in some previous deadlock detection algorithms,
+because they were in general very inneficient. Thus, automatically recovering from deadlocks could potentially cover real bugs that needs to be fixed immediately
+and also turn application's performance a lot worse in exchange.
+
+In non-interactive systems, there's a huge benefit of having deadlock exceptions in the programming language.
+Currently, it is very difficult to find a deadlock when it happens but it's a lot harder when the system is not monitored constantly, as non-interactive systems usually are.
+In Pie at all's paper \cite{ian}, it is discussed how difficult it was to identify one of the concurrency bugs which was just a classical deadlock (two threads circularly waiting each other). However, the deadlock did not leave the application completely stuck, but instead an intended behaviour in a specific case did not happen because of this hidden deadlock
+which made the problem very hard to debug and be identified.
+
+We want to solve this problem by extending programming languages to support deadlock exceptions. We believe they can help developers to find and fix their mistakes
+in the code when they have such exception. However we want to solve this problem efficiently too, then we decided to focus on the most common type of deadlock:
+two threads and two locks, waiting for each other. In this study, we've extended \emph{Lock} interface in java.util.concurrent package in Java OpenJDK to support
+a runtime exception called \emph{DeadlockException}. It was later tested with students to measure how its presence could improve their ability to accurately identify issues in the code.
+We will present the implementation of this deadlock algorithm and its evaluation with students in the following chapters.

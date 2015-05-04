@@ -1,0 +1,10 @@
+\begin{abstract}
+Concurrent programming is difficult as programs fail in non obvious ways. When deadlocks happen, there's no clear indication of error. This paper supports the idea that deadlocks are runtime errors and they should be signaled with exceptions.
+We leverage two insights to make this practical: (i) most deadlocks occurring in real systems involve only two threads acquiring two locks (TTTL deadlocks); and (ii) it's possible to detect TTTL deadlocks efficiently enough for most practical systems.
+We conducted a study on bug reports and found that more than 90\%  of identified deadlocks were indeed TTTL (i).
+We extended Java's {\tt ReentrantLock} class to detect TTTL deadlocks and measured its performance impact with conservative benchmark. Its overhead ranges between 50\% to 90\% (ii).
+Empirical usability evaluation in two experiments showed that students finished tasks faster with our implementation.
+We conclude deadlock exceptions allows finding bugs more efficiently with sufficiently low overhead.
+
+\keywords{deadlock, concurrency, exception handling, empirical studies}
+\end{abstract}

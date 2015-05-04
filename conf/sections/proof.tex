@@ -1,0 +1,213 @@
+\section{Deadlock Detection}
+
+We have modified the default implementation of Java's \emph{ReentrantLock} to allow efficient runtime detection of TTTL deadlocks. We take advantage of \emph{ReentrantLock} current algorithm and some of its guarantees to avoid the need to introduce extra synchronization mechanisms or costly atomic operations in this detection. It works as follows:
+
+\begin{enumerate}
+\item Each lock has a pointer for a thread which is the current owner or null when there's no thread owning that lock.
+\item Each lock has an integer to represent its current state: 0 means the lock is free and no thread owning it (the \emph{unlocked} state), 1 means there's a thread owning the lock (the \emph{locked} state). For simplicity, we are only interested on these two states and its change holds the most complexity, but in the implementation of \emph{ReentrantLock} each time the thread owner acquires the same lock, this state would be incremented, and decremented each time the thread releases it.
+\item Each thread has a thread-local list of pointers of locks they are currently owning.
+\item Each lock has a waiting queue of threads that are waiting to acquire it. Whenever a thread try to obtain a lock when it's already acquired, the thread will add itself on the waiting queue before parking. Upon the event of releasing the lock, the owner of that lock will look for the first thread in the waiting queue and unpark it.
+\item When a thread wants to acquire a lock, it will swap the current state to \emph{locked} if the current state is \emph{unlocked} atomically.
+\begin{enumerate}
+\item If the thread fails, it must be because the lock is already owned by some other thread, then it will add itself on the waiting queue for that lock. Finally, the thread will park.
+\item Otherwise, the thread will set itself as the current owner of that lock and also add this lock to its thread-local list of pointers of locks it owns.
+\end{enumerate}
+\item When a thread is about to release a lock, the current owner pointer of that lock is set to null and that lock is also removed from the thread-local list of owned locks. Finally, the lock state is changed to \emph{unlocked}.
+\item Before parking, a thread will check whether there's deadlock. When the current thread is unable to acquire its desired lock, it must be because another thread is owning it already. It is possible to know who is the owner of any lock, so the current thread identifies the owner of its desired lock as the conflicting thread. Then the current thread will search on each lock of its thread-local list of owned locks if the conflicting thread is waiting on it.
+\begin{enumerate}
+\item If positive, then we have a circular dependency (current thread is stuck waiting its desired lock and the conflicting thread is stuck waiting for a lock the current thread owns) thus a deadlock exception will be raised.
+\item Otherwise, the thread parks.
+\end{enumerate}
+\end{enumerate}
+
+This protocol relies on a few guarantees that were already provided by \emph{ReentrantLock} default implementation such as:
+\begin{enumerate}
+\item The operation of swapping the state of a lock from \emph{unlocked} to \emph{locked} must be done atomically by the thread, so only one thread can be successful at a time.
+\item A thread will only park when it's guaranteed some other thread can unpark it. Missing notifications will never happen and concurrent uses of park and unpark on the same thread will be resolved gracefully.
+\item Inserts on each lock's waiting queue must be done atomically. If multiple threads concurrently attempt to insert themselves in the waiting queue on the same lock, they will both succeed eventually but the exact order of insertions is not important.
+\item Once the last element in the waiting queue of a lock is read, it should be safe to read all threads in the waiting queue that arrived before the last element. Since the thread who reads the waiting queues is also the one who blocks every thread waiting on the queues, we can guarantee the only updates that could happen concurrently is new insertions at the end of each queue. However insertions in the end of the queue are not important once a last element pointer is obtained.
+\end{enumerate}
+
+Now we show why this algorithm works:
+
+\begin{lemma}
+Protocol can always detect deadlock TTTL deadlocks as soon as they happen.
+\end{lemma}
+\begin{proof}
+Suppose not and a TTTL deadlock occurred without deadlock exception being raised.
+Let's assume that threads \emph{A} and \emph{B} have both acquired locks \emph{a} and \emph{b} respectively, as follows:
+\begin{equation}
+write_{A}(state_{a} = locked) \rightarrow write_{A}(owner_{a} = A)
+\end{equation}
+\begin{equation}
+write_{B}(state_{b} = locked) \rightarrow write_{B}(owner_{b} = B)
+\end{equation}
+And now each thread will attempt to acquire the opposing lock: thread \emph{A} is trying to acquire lock \emph{b} and thread \emph{B} is trying to acquire lock \emph{a}, as follows:
+\begin{equation}
+read_{A}(state_{b} == locked) \rightarrow write_{A}(waiting\_queue_{b}.insert(A))
+\end{equation}
+\begin{equation}
+read_{B}(state_{a} == locked) \rightarrow write_{B}(waiting\_queue_{a}.insert(B))
+\end{equation}
+If a TTTL deadlock happened, then both threads are now parked and all previous equations should be correct.
+But before parking, each thread must check for deadlock by inspecting each lock it owns if the opposing thread is on its waiting queue.
+As we initially assumed no deadlock exception has been raised, then both threads are parked and also the following equations must be correct:
+\begin{equation}
+read_{A}(owner_{b} == B) \rightarrow read_{A}(waiting\_queue_{a}.contains(B) == false)
+\end{equation}
+\begin{equation}
+read_{B}(owner_{a} == A) \rightarrow read_{B}(waiting\_queue_{b}.contains(A) == false)
+\end{equation}
+The problem with the previous equations is that they both cannot be true simultaneously.
+Before checking for deadlock, each thread must add itself on the waiting queue of its desired lock.
+If it holds that the opposing thread is not in the waiting queue yet, then it must be because it did not start to check for deadlock yet, thus a contradiction.
+\end{proof}
+
+\begin{lemma}
+Protocol never throw a deadlock exception for a non-existent TTTL deadlock.
+\end{lemma}
+\begin{proof}
+Suppose the opposite: a deadlock exception was raised and there's no real 2-deadlock. At least one of the following equations must be true in order to raise a deadlock exception:
+\begin{equation}
+read_{A}(owner_{b} == B) \rightarrow read_{A}(waiting\_queue_{a}.contains(B) == true)
+\end{equation}
+\begin{equation}
+read_{B}(owner_{a} == A) \rightarrow read_{B}(waiting\_queue_{b}.contains(A) == true)
+\end{equation}
+Suppose without loss of generality the first equation is correct.
+It means thread \emph{B} is waiting for lock \emph{a} and it is also the owner of lock \emph{b}.
+If it is on the waiting queue, that thread is either parked already or about to park
+and in both cases it means thread \emph{B} is going to depend on the release of lock \emph{a} to proceed.
+However, as we have seem previously, thread \emph{A} at this point is also about to park and is checking for a deadlock.
+If this condition holds, we have a circular dependency between threads \emph{A} and \emph{B}, a real TTTL deadlock, thus we have a contradiction.
+\end{proof}
+
+We have further extended the protocol to also guarantee the exception being raised on both threads involved. This does not affect how deadlock is detected but what should be done after a deadlock is detected, adding the following steps:
+
+\begin{enumerate}
+\item Each lock has a list of tainted threads. This list should only be read or updated by the owner of that lock, allowing immunity from interference without any extra synchronization cost.
+\item Once a deadlock is detected and the current thread is about to raise a deadlock exception, it already knows: which thread is conflicting with itself; and which lock that thread is desiring. Then the current thread (the owner of the desired lock) will add this conflicting thread in tainted threads list for that lock. After that, deadlock exception is raised.
+\item When the conflicting thread is unparked and finally acquires its desired lock (it becomes the owner of that lock), then it is allowed to read the list of tainted threads. If this thread identifies itself into this list, then it must be because it was part of a deadlock before, so it removes its reference from the list and also raise a deadlock exception.
+\item Every operation on the list of tainted threads of any locks (either reading or inserting values) should be followed up by some cleanup on all references of threads that are no longer running.
+\end{enumerate}
+
+That is sufficient to force both threads to throw exceptions when only one of them would raise an exception in the initial protocol. Initial protocol would only throw exception on both if both threads simultaneously reach the point where they check for deadlock existence. However, for this particular case, this change introduces a different problem: dangling references:
+each thread would have added their conflicting thread on its owned locks's tainted threads list,
+but none of them would be able to acquire their respective desired locks (as in \emph{item 3}),
+thus leaving their references behind for others to cleanup (as in \emph{item 4}). We minimize this issue by asking other threads to clean these unneeded references as soon as they use any of the locks involved in the deadlock.
+
+%\subsection{Implementation}
+%
+%In this subsection we present pseudocode for the proposed protocols, highlighting only the differences we made on \emph{ReentrantLock} to follow the protocols covered previously. The actual code can be found on our github repository \cite{repo}.
+%
+%\medskip
+%\noindent
+%{\it Changes on ReentrantLock: keep ownedLocks list updated}
+%\begin{verbatim}
+%// This is a thread-local inside a lock.
+%// Each thread keeps the list of locks they own.
+%DEFINE_PER_THREAD(List<Lock>, ownedLocks);
+%
+%// As soon as a lock is acquired or release, this function is called.
+%// Based on that, we call register or unregister owned lock.
+%void setExclusiveOwner(Thread thread) {
+%  owner = thread;
+%  if (owner == null) {
+%    unregisterOwnedLock();
+%  } else {
+%    registerOwnedLock();
+%  }
+%}
+%
+%// These functions register or unregister the current lock
+%// in the thread-local list ownedLocks.
+%registerOwnedLock();
+%unregisterOwnedLock();
+%\end{verbatim}
+%
+%Following the first part of the protocol, we must keep a list of locks each thread owns.
+%This list is thread-local so it's free from interference (each thread will only manage its own list). Method calls to \emph{setExclusiveOwner} are intercepted to also update the list of owned locks accordingly as follows: whenever the call resets the owner it means there was a release, so we unregister that lock and removes it from the list of owned locks of the current thread; futhermore, we do the opposite when the owner is not null, as it means that the thread has owned that lock and it should update its own list of owned locks to add that particular entry.
+%
+%\medskip
+%\noindent
+%{\it Changes on ReentrantLock: detect deadlock and throw exception}
+%\begin{verbatim}
+%void park() {
+%  Thread conflictingThread = owner;
+%  if (isAnyOwnedLockDesiredBy(conflictingThread)) {
+%    clearOwnedLocksByCurrentThread();
+%    throw new DeadlockException();
+%  }
+%  LockSupport.park(this);
+%}
+%
+%// Returns true if any of the locks owned by the current thread
+%// contain a given thread in the waiting queue.
+%isAnyOwnedLockDesiredBy(Thread);
+%
+%// Clear all locks in the list of owned locks by the current thread.
+%clearOwnedLocksByCurrentThread();
+%\end{verbatim}
+%
+%When a thread attempts to acquire a lock and this lock is already owned, we deploy the deadlock check right before the thread actually get parked.
+%It starts by checking which thread is the owner of this particular lock, then the current thread checks whether there's any lock owned by itself
+%that is currently being waited by that conflicting thread. If positive, then we have a circular wait so we must throw a deadlock exception.
+%Next step is to guarantee that both threads will receive the deadlock exception.
+%
+%\medskip
+%\noindent
+%{\it Changes on ReentrantLock: throw deadlock exception on both threads}
+%\begin{verbatim}
+%// Each lock will have a list of threads that are not allowed to
+%// acquire this lock (if it happens, throw exception).
+%DEFINE_PER_LOCK(List<Thread>, taintedThreads);
+%
+%void park() {
+%  Thread conflictingThread = owner;
+%  List<Lock> desiredLocks =
+%    getOwnedLocksDesiredBy(conflictingThread);
+%  if (!desiredLocks.isEmpty()) {
+%    foreach(Lock k in desiredLocks) {
+%      k.taintedThreads.add(conflictingThread);
+%    }
+%    clearOwnedLocksByCurrentThread();
+%    throw new DeadlockException();
+%  }
+%  LockSupport.park(this);
+%}
+%
+%// Returns a list of locks owned by the current thread where
+%// a particular Thread (passed as parameter) is waiting for.
+%getOwnedLocksDesiredBy(Thread);
+%
+%// Add a check as soon as a thread acquires this lock.
+%// If it is marked as tainted, then throw exception.
+%void setExclusiveOwner(Thread thread) {
+%  owner = thread;
+%  if (owner == null) {
+%    unregisterOwnedLock();
+%  } else {
+%    registerOwnedLock();
+%    if (taintedThreads.contains(thread)) {
+%      clearOwnedLocksByCurrentThread();
+%      throw new DeadlockException();
+%    }
+%  }
+%}
+%
+%\end{verbatim}
+%
+%We expand the algorithm by adding a list per lock with threads that were involved in a deadlock and should throw exception as soon as possible.
+%
+%Previously, when a deadlock was detected, the following case was possible: one thread throws an exception and releases all its locks, then the second thread would finally acquire its desired lock
+%which should be made free after the first thread have released its locks. Now, this case is no longer possible: the thread throwing an exception will add the conflicting thread on locks it owns immediately before exception is thrown. When the conflicting thread manages to acquire all locks previously owned by the first thread, then it will have to throw an exception too since its reference was present in one of the locks.
+%
+%As mentioned before, there's a small disadvantage of this final solution which is a leak of Thread references on taintedThreads objects for each lock. It can happen when both threads
+%simultaneously detect the deadlock and both throw exceptions. In this case, they would have added the opposing thread inside their own lock's taintedThreads list, but afterwards
+%both threads would stop and none of them would attempt to acquire the opposite lock again. We've minimized the effect of this leak by also removing non-active thread
+%references from taintedThreads list every time any update is done on this list, so in practice other threads would eventually clean up them. The code which minimizes this
+%leak is available on our repository \cite{repo}, but for the sake of brevity we've not included it here.
+
+
+
+
