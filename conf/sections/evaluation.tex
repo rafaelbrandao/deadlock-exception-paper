@@ -1,10 +1,10 @@
 \section{Evaluation}
 
-In this section we present an evaluation of our approach. Our evaluation comprises two parts: (i) a usability evaluation involving two experiments with two groups of students (Section~\ref{sec:usab}); and (ii) a preliminary analysis of the performance overhead of our approach (Section~\ref{sec:perf}).
+In this section we present an evaluation of our approach. Our evaluation comprises two parts: (i) a usability evaluation involving two experiments with two groups of students (Section~\ref{sec:usab}); and (ii) a preliminary analysis of the performance overhead of our approach (Section~\ref{sec:perf}). The exact input, instructions, and any additional document we have used in this section should be available at \cite{repo}.
 
 \subsection{Usability Evaluation}\label{sec:usab}
 
-We ran empirical evaluation to measure the efficiency of deadlock exceptions with regards to problem solving speed and accuracy. We defined two research questions for this evaluation: {\bf RQ1.} Is the time spent to identify the bug reduced using our implementation? {\bf RQ2.} Is the accuracy of bug description improved for implementation with deadlock exception when compared to the default one? To answer the first question, we watched for the time (in seconds) to finish each task. For the second question, each answer was evaluated based on five criteria with three different values: 0 for absence, 0.5 for partially present and 1 for fully present. Whenever $(A - B) + C \geq 1.5$ was true, we defined it as a correct answer. It defines a correct answer whenever the bug was described as deadlock and at least one of the methods (out of two) involved in the deadlock were identified.
+We ran empirical evaluation to measure the efficiency of deadlock exceptions with regards to problem solving speed and accuracy. We defined two research questions for this evaluation: {\bf RQ1.} Is the time spent to identify the bug reduced using our implementation? {\bf RQ2.} Is the accuracy of bug description improved for implementation with deadlock exception when compared to the default one? To answer the first question, we watched for the time (in seconds) to finish each task. For the second question, each answer was evaluated based on three criteria with three possible values each: 0 for absence, 0.5 for partially present and 1 for fully present. Whenever $(A - B) + C \geq 1.5$ was true, we defined it as a correct answer, that is, whenever the bug was described as deadlock and at least one of the methods involved in the deadlock were identified correctly.
 
 \begin{table}
 \begin{center}
@@ -21,15 +21,17 @@ C & Correctly identified method calls involved in the deadlock.\\
 \end{center}
 \end{table}
 
-We wrote two programs with different complexity which were presented in the same order for all subjects. The first program, known as \emph{Bank}, contained 4 classes spread in 4 files, 3 threads, 3 explicit locks, and 82 lines of code in average. The second program, known as \emph{Eclipse} had 15 classes spread in 11 files, 4 threads, 5 explicit locks, and 40 lines of code in average. We expected the first program to be easier to identify the deadlock because it contained fewer classes and files. Each program could use either \emph{LockA} or \emph{LockB}, where \emph{LockA} was our implementation with deadlock detection on at least one thread involved in a deadlock, while \emph{LockB} was just the default \emph{ReentrantLock} implementation. We randomly assigned a group to each student. In group A, student would start with \emph{LockA} in the first question but change to \emph{LockB} on the second one; meanwhile, in group B students would have the locks in opposite order. Finally, we randomly paired subjects in pairs composed of one subject in group A and another subject of group B and created latin squares for each pair.
+We wrote two programs with different complexity which were presented in the same order for all subjects. The first program, known as \emph{Bank}, contained 4 classes spread in 4 files, 3 threads, 3 explicit locks, and 82 lines of code in average. The second program, known as \emph{Eclipse} had 15 classes spread in 11 files, 4 threads, 5 explicit locks, and 40 lines of code in average. We expected the first program to be easier to identify the deadlock because it contained fewer classes and files. Each program could use either \emph{LockA} or \emph{LockB}, where \emph{LockA} was our implementation with deadlock detection on at least one thread involved in a deadlock, while \emph{LockB} was just the default \emph{ReentrantLock} implementation. Each student was assigned to either group A or B randomly. In group A, student would start with \emph{LockA} in the first program but use \emph{LockB} on the second program; meanwhile, in group B students would have the locks in opposite order.
 
-All students started the experiment with the first question containing \emph{Program 1}. When they finish to provide an answer, they should request for the second question. In this case, we collect the assignment, set a timestamp on it, and deliver second question with \emph{Program 2}. The timestamp was written by supervisors of this experiment based on a chronometer we had visible to everyone on the laboratory. Sometimes when the subject wrote the timestamp themselves once they have finished, supervisors had to double check the value at the time the assignment was collected, overwriting the timestamp if needed. We wanted to have 60 min as time limit for each question on both days, but on the first day the students asked for more time, so we expanded to 90 min each. 
+All students started the experiment with the first question containing \emph{Program 1}. When they finish to provide an answer, they should request for the second question. In this case, we collect the assignment, set a timestamp on it, and deliver second question with \emph{Program 2}. Timestamp was written based on a chronometer visible to everyone in the laboratory.
+We set time limit for each question as 60 min, but the first group requested more time and we expanded to 90 min each. 
 
-We have repeated this experiment for two groups of students with different backgrounds. The first group consisted of undergraduate students attending Programming Language Paradigms course. They had classes about concurrent programming, including exercises in Java using \emph{ReentrantLock} where deadlocks and other concurrent bugs should be avoided; however, these students were not experienced in this area. The second group consisted of graduate students enrolled in master's degree or PhD program attending Parallel Programming course where they had classes about advanced concepts of parallel programming and had a lot of practical exercises, including implementing their own lock; thus, they were expected to have a lot of experience. We run this experiment with each group on different days.
+We ran this experiment with two groups in two different days. First group consisted of undergraduate students attending Programming Language Paradigms course; they had classes about concurrent programming, including exercises in Java using \emph{ReentrantLock} where deadlocks and other concurrent bugs should be avoided; however, these students were not experienced. Second group had graduate students enrolled in master's degree or PhD program attending Parallel Programming course; they had classes about advanced concepts of parallel programming and had practical exercises, including implementing their own lock; consequently they were expected to be very experienced in detecting concurrency bugs.
 
 \subsubsection{Time Analysis.}
 
-We defined the following hypothesis to answer {\bf RQ1}:
+We defined the following hypothesis to answer {\bf RQ1}. We used Latin Square Design to control two factors that might affect the metrics: subjects and program complexity.
+Program complexity we define as the amount of files in the program, number of threads and number of locks to analyze. We wanted to have one program that we considered easy to identify the bug even without exceptions and another program that was more difficult, composed by many files and classes and reflecting a more realistic case. We provided implementations of each program using either \emph{LockA} or \emph{LockB}: the two possible treatments that we want to compare. Since we had N subjects, 2 programs and 2 possible treatments, we disposed subjects in rows and programs in columns of latin squares, randomly assigning in each cell of the square a treatment that could be \emph{LockA} or \emph{LockB}, but also guaranteeing that for any given row or column in this square, each treatment appears only once. Consequently, we have replication, local control and randomization which are the three principles of experiment design \cite{box}. Time analysis was conducted with R Statistical Software using the inputs extracted from each day. We used the linear model described in Figure 1 that considers the effect of different factors on the response variable similarly to Accioly \cite{paola}, adding the effect between each replica and treatment as explained by Sanchez \cite{sanchez}.
 
 \begin{equation}
   H_{0} : \mu_{TimeLockA} \geq \mu_{TimeLockB}
@@ -37,12 +39,6 @@ We defined the following hypothesis to answer {\bf RQ1}:
 \begin{equation}
   H_{1} : \mu_{TimeLockA} < \mu_{TimeLockB}
 \end{equation}
-
-In order to prevent bias, we needed to control a few factors during the experiment execution. The first factor was the selection of subjects to participate on this experiment, as different background knowledge could potentially influence chosen metrics. The second factor we had to control was the complexity of each program. Complexity we define as the amount of files in the program, number of threads and number of locks to analyze. We wanted to have one program that we considered easy to identify the problem without exceptions and another that was more complex and composed by many files and classes, reflecting a more realistic case. We provided implementations of each program using either \emph{LockA} or \emph{LockB}: the two possible treatments that we want to compare.
-
-We used Latin Square Design to control these two factors mentioned earlier: subjects and program complexity factors. Since we had N subjects, 2 programs and 2 possible treatments, we disposed subjects in rows and programs in columns of latin squares, randomly assigning in each cell of the square a treatment that could be \emph{LockA} or \emph{LockB}, but also guaranteeing that for any given row or column in this square, each treatment appears only once. Consequently, we have replication, local control and randomization which are the three principles of experiment design \cite{box}.
-
-Time analysis was conducted with R Statistical Software using the inputs extracted from each day. We've used the linear model described in Figure 1 that considers the effect of different factors on the response variable similarly to Paola's work \cite{paola}, but we've also added the effect between each replica and the treatment as explained by Sanchez \cite{sanchez}.
 
 \begin{figure}
 \begin{center}
@@ -61,7 +57,7 @@ $\epsilon_{lijk}$ & - random error \\
 \end{center}
 \end{figure}
 
-Initially, we've plotted the box-plot graphic shown in Figure \ref{fig:boxplot} for both experiments. Then we've run the Box-Cox transformation - which is a power transformation - to reduce anomalies such as non-additivity and non-normality, and we found the value of $\lambda$ at the maximum point in the curve was not approximately 1 ($\lambda = 5$), thus we should apply the transformation; that is, on our regression model, $Y_{lijk}$ should be powered to $\lambda$ we found. Similarly, we applied Box-Cox transformation for the second experiment as $\lambda = 1.3636$.
+Initially, we plotted box-plot graphics shown in Figure~\ref{fig:boxplot} for both experiments. Then we run Box-Cox transformation to reduce anomalies such as non-additivity and non-normality. The value of $\lambda$ at the maximum point in the curve drawn by box-cox function in R was not approximately 1 ($\lambda = 5$), thus we should apply the transformation: on our regression model, $Y_{lijk}$ should be powered to $\lambda$. We did the same on the second experiment as $\lambda = 1.3636$.
 
 \begin{figure}%
     \centering
@@ -72,16 +68,14 @@ Initially, we've plotted the box-plot graphic shown in Figure \ref{fig:boxplot} 
     \label{fig:boxplot}%
 \end{figure}
 
-After applying Box-Cox transformation, we ran Tukey Test of Additivity that checks whether effect model is additive, so we can evaluate whether interaction between factors displayed on the rows and columns of each latin square won't affect significantly the response when the model is additive \cite{box}; thus, considering the following hypothesis:
+After applying Box-Cox transformation, we ran Tukey Test of Additivity that checks whether effect model is additive, so we could evaluate whether interaction between factors displayed on the rows and columns of each latin square wouldn't affect significantly the response when the model is additive \cite{box}. Considering the following hypothesis, in the first experiment, we obtained a p-value of 0.514 which is not lower than 0.05 thus we couldn't reject $H_{0}$, thus our model was additive; similarly for the second experiment, the model was also additive as p-value found was 0.914.
 
 \begin{tabular}{ll}
 $H_{0}$ & : The model is additive \\
 $H_{1}$ & : $H_{0}$ is $false$ \\
 \end{tabular}
 
-In the first experiment, we obtained a p-value of 0.514, which is not lower than 0.05 thus we cannot reject $H_{0}$. That means the model was considered to be additive. We had the same conclusion for the second experiment where p-value was 0.914.
-
-Finally, we ran the ANOVA (ANalysis Of VAriance) test which compares the effect of treatments on the response variable, providing an approximated p-value for every associated factor. When a variable has \emph{p-value} $< 0.05$, it means that factor was significant to the response. We can see from Table \ref{tab:unova1} and Table \ref{tab:unova2} the most important factor was indeed the type of \emph{Lock} for both experiments, thus allowing us to reject our null hypothesis defined for {\bf RQ1}.
+Finally, we ran the ANOVA (ANalysis Of VAriance) test which compares the effect of treatments on the response variable, providing an approximated p-value for every associated factor. When a variable has \emph{p-value} $< 0.05$, it means that factor was significant to the response. Table~\ref{tab:unova1} and Table~\ref{tab:unova2} shows the most important factor as the type of \emph{Lock} for both experiments, allowing us to reject our null hypothesis defined for {\bf RQ1}.
 
 \begin{table}%
 \begin{center}
@@ -120,7 +114,7 @@ Residuals        & 6 &  181610625 &   30268438 &         &           &     \\
 
 \subsubsection{Accuracy Analysis.}
 
-We defined the following hypothesis to answer {\bf RQ2}:
+We used the number of correct answers using each lock to measure accuracy, so we defined the following hypothesis to answer {\bf RQ2}. 
 
 \begin{equation}
   H_{0} : \mu_{CorrectAnswersLockA} \leq \mu_{CorrectAnswersLockB}
@@ -128,8 +122,6 @@ We defined the following hypothesis to answer {\bf RQ2}:
 \begin{equation}
   H_{1} : \mu_{CorrectAnswersLockA} > \mu_{CorrectAnswersLockB}
 \end{equation}
-
-Since we were interested in the number of correct answers for each lock, we ran the equation defined previously to count how many of them were correct and obtained the following tables:
 
 \begin{table}
 \parbox{.45\linewidth}{
@@ -142,7 +134,7 @@ LockA & 29 & 2\\
 LockB & 16 & 15\\
 \hline
 \end{tabular}
-\caption{First group accuracy}
+\caption{First group accuracy}\label{tab:accuracy1}
 }
 \hfill
 \parbox{.45\linewidth}{
@@ -155,23 +147,21 @@ LockA & 13 & 1\\
 LockB & 10 & 4\\
 \hline
 \end{tabular}
-\caption{Second group accuracy}
+\caption{Second group accuracy}\label{tab:accuracy2}
 }
 \end{table}
 
-Applying Fisher's exact test we can see that undergraduate students results presented a two-tailed P value equals 0.0004: the association between rows (groups) and columns (outcomes) was considered to be extremely statistically significant; consequently, it's an evidence of improvement on accuracy. Meanwhile graduate students results presented a two-tailed P value equals 0.3259, which does not represent a statistically significant evidence.
+Applying Fisher's exact test on data from Table~\ref{tab:accuracy1} and Table~\ref{tab:accuracy2}, we can see that undergraduate students results presented a two-tailed P value equals 0.0004: the association between rows (groups) and columns (outcomes) was considered to be extremely statistically significant; consequently, it's an evidence of improvement on accuracy. However graduate students results presented a two-tailed P value equals 0.3259, which does not represent a statistically significant evidence.
 
 % TODO: add script and the data used (anonymized) to appendices or put on github and link %
 
 \subsubsection{Discussion}
 
-% TODO: review this section, it was written based on older results %
-
-We can see in our results that both groups of students have improved their time to solve the problem when they had the lock with deadlock exception. But only for the first group we found statistically significant evidence that it improved answers accuracy. Although we cannot draw conclusions regarding improved accuracy, we can share some relevant observation we had during the second experiment: some students in the second group were greatly experienced on concurrent programming and they knew how to efficiently find a deadlock using the tools available in Eclipse, thus being able to finish the tasks really quickly for both problems knowing exactly which points in the code were involved in the deadlock. Thus it's possible deadlock exceptions being more helpful for less experienced programmers in general. However we believe their benefits are beyond helping just inexperienced programmers. Experienced programmers would still benefit in many cases where the deadlock is not as obvious as in the exercise we presented. For example, in a more realistic situation, a deadlock can happen in a background thread that doesn't really affect the program execution overall but make the execution lack some expected behavior. Furthermore, in non-interactive systems where they are only running in background, is nearly impossible to know when there's a problem unless this software is monitored constantly which is very time consuming or the system produces output constantly that is affected by a potential deadlock. If we have a deadlock exception, we can either prepare and handle this exception on the code level, or just have this signal from output that would help developers to fix it later.
+Although we cannot draw conclusions regarding improved accuracy, we found some interesting behavior. Some students in the second group were greatly experienced on concurrent programming and they knew how to efficiently find a deadlock using the tools available in Eclipse, thus being able to finish the tasks really quickly for both problems knowing exactly which points in the code were involved in the deadlock. This observation allows us to hypothetize whether deadlock exceptions are more helpful for less experienced programmers in general, but we leave this as a proposal for future work.
 
 \subsubsection{Threats to Validity}
 
-In this usability evaluation, we collected evidence on how the presence of deadlock exception affects student ability to quickly identify deadlocks accurately, but we should make a few remarks regarding the validity of our results. First remark is about the way we collected the timestamps: when a student finished any question, we manually wrote their name with the timestamp on the whiteboard so we could track time limit individually later, but we could potentially reduce overhead and increase timestamps precision if we used an automated alternative.
+We must consider a few remarks regarding the validity of our results. First remark is about the way we collected the timestamps: when a student finished any question, we manually wrote their name with the timestamp on the whiteboard so we could track time limit individually later, but we could potentially reduce overhead and increase timestamps precision if we used an automated alternative.
 Secondly, the first group did this experiment in replacement of their actual exam might have impacted the time we measured. We noticed some students spent more time on each question by purpose. We believe that they were reluctant to ask for the next question because they still had plenty of time left and they wanted to make sure it was correct. We did not notice such behavior with the second group of students and we believe it is because they did not have the same pressure to deliver correct results as the first group had.
 Third remark is related to programs' complexity: the ones we used to evaluate the students are considerably easier to understand than most programs in real world, but unfortunately we could not use any real world scenario as students would not be able to finish each assignment in time; with that in mind, we created two questions based on real world bugs we found on our bug report studies.
 Forth remark is about different background over different subjects: we tried to minimize their background differences by selecting groups where students had at least basic experience in concurrent programming and they should be familiarized with the types of bugs such codes could have; the first group was composed by undergraduate students who attended the class \emph{Paradigms of Computaional Languages} where deadlocks were covered in classes and exercises; meanwhile, the second group had graduate students who attended the class \emph{Parallel Programming} which covered concurrent programming in low level detail including deadlock detection. Last remark is about whether we are able to draw conclusions based on students data: some studies suggest that using students as subjects is as good as using industry professionals \cite{staron}; Runes ran an experiment which shows that there's not much significant differences between undergraduate, graduate and industry professionals, with the exception that undergraduate students often take more time to complete the tasks \cite{runes}.
@@ -183,7 +173,7 @@ OrderedLock deeply relies on Eclipse's code architecture. So, in order to use it
 
 We developed a synthetic benchmark that creates \emph{N} threads that perform additions to ten integer counters where each increment in a counter is protected by explicit locks. Each thread would have to increment its corresponding counter 1000 times before finishing its execution and the counters were evenly distributed across the threads. Therefore, each counter will have exactly \emph{(N / 10)} threads doing increments on it and higher values of \emph{N} result in higher contention, that is, more threads will compete against each other for a particular counter. In this preliminary evaluation, we have conducted measurements for values of $N$ equal to 10, 50, 100, and 200. Since each thread in the benchmark never acquires more than one lock at the same time, deadlocks cannot occur. We emphasize that this setup is very conservative, since every operation that each thread performs requires locking. Thus, the obtained overhead will be a worst-case estimate and thus much higher than one would encounter in a real-world application~\cite{lozi}. 
 
-The measurements were made on an Intel CoreTM i7 3632QM Processor (6Mb Cache, 2.2GHz) running Linux and each cell in Table~\ref{tab:overhead} is the average of 50 executions (preceded by 20 executions that served as a warm-up). 
+The measurements were made on an Intel CoreTM i7 3632QM Processor (6Mb Cache, 2.2GHz) running Ubuntu 12.04.4 LTS and each cell in Table~\ref{tab:overhead} is the average of 50 executions (preceded by 20 executions that served as a warm-up). 
 
 \begin{table}
 \begin{center}
