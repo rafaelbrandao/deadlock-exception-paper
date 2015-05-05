@@ -27,47 +27,30 @@ Lastly, category \emph{D} is set for all bugs that we could not understand clear
 \subsection{Results Analysis}
 
 Initially we  consider only bugs we clearly identified, that is, bugs that were not labeled as category D.
-In Table~\ref{tab:categ}, we can see in that from all resource deadlocks, 92.07\% of them are indeed TTTL deadlocks.
+In Table~\ref{tab:categ} (second column), we can see in that from all resource deadlocks, 92.07\% of them are indeed TTTL deadlocks.
 Another interesting finding is that 75.93\% of all deadlocks are indeed resource deadlocks.
 
 \begin{table}
 \begin{center}
-\caption{Labeled Categories}\label{tab:categ}
-\begin{tabular}{|l|l|}
+\caption{Labeled Categories and Estimations}\label{tab:categ}
+\begin{tabular}{|l|l|l|}
 \hline
-Category & Number of Bugs \\
+Category & Number of Bugs & Estimated \\
 \hline
-A & 101 \\
-A and TTTL & 93 \\
-B & 32 \\
-C & 23 \\
-D & 69 \\
+A & 101 & 146 \\
+A and TTTL & 93 & 134  \\
+B & 32 & 46 \\
+C & 23 & 33 \\
+D & 69 & 0 \\
 \hline
 \end{tabular}
 \end{center}
 \end{table}
 
-If we now consider bugs we could not clearly classify, we can make some estimations of how many of them would be resource deadlocks and TTTL deadlocks. The first estimate is the worse case scenario, that is, all bugs in category D should be in category A but none of them would be TTTL deadlocks. In this case, only 54.7\% of resource deadlocks would be TTTL deadlocks. If we look at the best case scenario, that is, all bugs in D would be TTTL deadlocks, then it would be 95.29\% instead. However none of these two scenarios seems realistic. We believe that a more realistic scenario would be to assume that bugs in category D are distributed roughly in the same way as those in categories A, B, and C. If that is the case, out of all resource deadlocks, we estimate that 91.7\% of them would also be TTTL deadlocks (Table~\ref{tab:estcateg}. Thus TTTL deadlocks are certainly the most popular type of resource deadlocks, amouting to more than 9 out of every 10 resource deadlocks. This result makes it evident that an approach to automatically detect these deadlocks has practical value.  
+If we now consider bugs we could not clearly classify, we can make some estimations of how many of them would be resource deadlocks and TTTL deadlocks. The first estimate is the worse case scenario, that is, all bugs in category D should be in category A but none of them would be TTTL deadlocks. In this case, only 54.7\% of resource deadlocks would be TTTL deadlocks. If we look at the best case scenario, that is, all bugs in D would be TTTL deadlocks, then it would be 95.29\% instead. However none of these two scenarios seems realistic. We believe that a more realistic scenario would be to assume that bugs in category D are distributed roughly in the same way as those in categories A, B, and C. If that is the case (last column of Table~\ref{tab:categ}), out of all resource deadlocks, we estimate that 91.7\% of them would also be TTTL deadlocks. Thus TTTL deadlocks are certainly the most popular type of resource deadlocks, amounting to more than 9 out of every 10 resource deadlocks. This result makes it evident that an approach to automatically detect these deadlocks has practical value.  
 
 %Also, we saw that resource deadlocks are indeed more popular than communication deadlocks. Then if we focus on detecting TTTL deadlocks only, we would still cover most of the cases and at the same time optimize the code to detect it with as low overhead as possible.
 
-\begin{table}
-\begin{center}
-\caption{Estimated Labeled Categories Based On Distribution Found}\label{tab:estcateg}
-\begin{tabular}{|l|l|}
-\hline
-Category & Number of Bugs \\
-\hline
-A & 146 \\  
-A+TTTL &  134 \\
-B & 46 \\
-C & 33 \\
-\hline
-\end{tabular}
-\end{center}
-\end{table}
-
-
 \subsection{Threats to Validity}
 
-Only one of the authors labeled all bug reports due to constraints on time and lack of resources. In counterpart, having only one reviewer makes it easier to guarantee that all bug reports were reviewed following the exact same procedure, but we would have preferred to have at least one more reviewer to label each bug independently and use it as a way to double check the labels accuracy. Furthermore, one factor that might limit generalizability of these findings is that we have looked at only three different open-source projects written mostly in Java, but different programming languages may also have a different distribution of deadlock bugs.
+Only one of the authors labeled all bug reports due to constraints on time and lack of resources. In counterpart, having only one reviewer makes it easier to guarantee that all bug reports were reviewed following the exact same procedure, but we would have preferred to have at least one more reviewer to label each bug independently and use it as a way to double check the labels accuracy. Furthermore, one factor that might limit generalization of these findings is that we have looked at only three different open-source projects written mostly in Java, but different programming languages may have different distribution of deadlock bugs.

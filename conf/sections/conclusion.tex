@@ -3,8 +3,8 @@
 In this work, we investigated which kind of deadlock is the most popular by looking at actual bug reports
 in relevant open source projects and confirmed a previous study claim that TTTL deadlocks
 are the most frequent case of deadlock, that is, 92.07\% of all resource deadlocks we identified.
-This claim allowed us to focus on it instead and proposed an algorithm that
-efficiently detects them without any extra lock operations.
+%This claim allowed us to focus on it instead and proposed an algorithm that
+%efficiently detects them without any extra lock operations.
 We modified Java's \emph{ReentrantLock} and provided a lightweight
 version of it that detects TTTL deadlock in runtime.
 We measured its performance overhead with a very conservative benchmark

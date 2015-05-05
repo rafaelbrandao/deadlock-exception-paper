@@ -22,7 +22,7 @@ We have modified the default implementation of Java's \emph{ReentrantLock} to al
 \end{enumerate}
 \end{enumerate}
 
-This protocol relies on a few guarantees that are already provided by the \emph{ReentrantLock} implementation:
+This protocol relies on a few guarantees already provided by the \emph{ReentrantLock} implementation:
 \begin{enumerate}
 \item The operation of swapping the state of a lock from \emph{unlocked} to \emph{locked} must be done atomically by the thread, so only one thread can be successful at a time.
 \item A thread will only park when it is guaranteed that some other thread can unpark it. Missing notifications will never happen and concurrent uses of park and unpark on the same thread will be resolved gracefully.
@@ -30,7 +30,7 @@ This protocol relies on a few guarantees that are already provided by the \emph{
 \item Once the last element in the waiting queue of a lock is read, it should be safe to read all threads in the waiting queue that arrived before the last element. Since the thread who reads the waiting queues is also the one who blocks every thread waiting on the queues, we can guarantee the only updates that could happen concurrently are new insertions at the end of each queue. However insertions in the end of the queue are not important once a last element pointer is obtained.
 \end{enumerate}
 
-Now we show why this algorithm works:
+%Now we show why this algorithm works:%
 
 \begin{lemma}
 The proposed protocol can always detect TTTL deadlocks.
@@ -44,7 +44,7 @@ write_{A}(state_{a} = locked) \rightarrow write_{A}(owner_{a} = A)
 \begin{equation}
 write_{B}(state_{b} = locked) \rightarrow write_{B}(owner_{b} = B)
 \end{equation}
-In the above expressions, ` $x \rightarrow y$' indicates that event $x$ happened before event $y$. Notation `$write_{B}(owner_{b} = B)$' indicates that thread $B$ wrote to variable $owner_{b}$ the value $B$. 
+In the above expressions, `$x \rightarrow y$' indicates that event $x$ happened before event $y$. Notation `$write_{B}(owner_{b} = B)$' indicates that thread $B$ wrote to variable $owner_{b}$ the value $B$. 
 And now each thread will attempt to acquire the opposing lock: thread \emph{A} is trying to acquire lock \emph{b} and thread \emph{B} is trying to acquire lock \emph{a}, as follows:
 \begin{equation}
 read_{A}(state_{b} == locked) \rightarrow write_{A}(waiting\_queue_{b}.insert(A))
@@ -52,7 +52,7 @@ read_{A}(state_{b} == locked) \rightarrow write_{A}(waiting\_queue_{b}.insert(A)
 \begin{equation}
 read_{B}(state_{a} == locked) \rightarrow write_{B}(waiting\_queue_{a}.insert(B))
 \end{equation}
-The notation `read_{A}(state_{b} == locked)' indicates that thread $A$ read variable $state_{b}$ and obtained value $locked$.
+The notation `$read_{A}(state_{b} == locked)$' indicates that thread $A$ read variable $state_{b}$ and obtained value $locked$.
 If a TTTL deadlock happened, then both threads are now parked and all previous equations should be correct.
 But before parking, each thread must check for deadlock by inspecting each lock it owns if the opposing thread is on its waiting queue.
 As we initially assumed no deadlock exception has been raised, then both threads are parked and also the following equations must be correct:
@@ -102,9 +102,11 @@ each thread would have added their conflicting thread to the lists of tainted th
 but none of them would be able to acquire their respective desired locks (as in \emph{item 3}),
 thus leaving their references behind for others to cleanup (as in \emph{item 4}). We minimize this issue by asking other threads to clean these unnecessary references as soon as they use any of the locks involved in the deadlock.
 
-We modified OpenJDK \emph{ReentrantLock} to implement this algorithm and its code can be found in our code repository\cite{repo}. We had to omit here details about that implementation for brevity, but our repository contains commits log history describing what changes we did and why we did them.
+\subsection{Implementation}
 
-%\subsection{Implementation}
+We modified OpenJDK \emph{ReentrantLock} to implement this algorithm and its code can be found in our code repository in \cite{repo}. We had to omit details about that implementation here for brevity, but our repository contains commits log history describing what changes we did and why we did them.
+
+%
 %
 %In this subsection we present pseudocode for the proposed protocols, highlighting only the differences we made on \emph{ReentrantLock} to follow the protocols covered previously. The actual code can be found on our github repository \cite{repo}.
 %
