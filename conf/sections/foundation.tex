@@ -1,13 +1,10 @@
 \section{Related Work}
 
-Static analysis techniques verify source code from a program and try to identify potential problems present in the code without even executing it.
-For deadlock detection, they generally attempt to detect cyclic relationships of resource acquisition between threads where each cycle represents a possible deadlock.
-Many static analysis approaches were proposed \cite{marino}\cite{dawson}\cite{vivek}\cite{williams}
-but in general they suffer of signficant amount of false positives being reported as there may exist deadlock cycles that are just impossible to happen during execution.
-
-Dynamic analysis \cite{mcsdk}\cite{magicfuzzer} finds potential deadlock cycles from execution traces of programs which makes them often more scalable and precise than static analysis.
-However, due to the sizes of large-scale programs, the probability that a given run will show a thread acquiring a lock at the right time to trigger a deadlock for
-each potential deadlock present in the code is very low, which poses a challenge for dynamic deadlock detection tools. Other dynamic techniques \cite{sammati} \cite{rx} offer dynamic detection and recovery of deadlocks using \emph{rollback} operations which are usually very costly and not always possible \cite{pyla}. 
-
-Lastly, we have a hybrid analysis, they are often using program analysis and compile time instrumentation to guide runtime and achieve better performance \cite{serenity}
-or to run expensive computations during compile time to use later used at runtime \cite{grechanik}. Even though they employ both techniques simultaneously, they generate slower compile times, also requiring recompiling code to be able to find new potential deadlocks later. They also share limitations runtime techniques does, the main difference is that they tend to perform better than dynamic analysis alone during runtime.
+From many deadlock detection algorithms we saw, Sanmati \cite{sammati} and its successor Serenity \cite{serenity} were the most similar to our work,
+as they were dynamic analysis tools capable of detecting deadlocks at runtime and requiring no code changes to work.
+But the main differences were: instead of providing exceptions, they recovered from deadlocks by discarding changes to memory done
+inside critical sections during a rollback operation; lastly, it would only work for threaded applications that used pthreads interface.
+However these two promising approaches had several limitations \cite{pyla}:
+(i) rollback of acquired locks and all its related memory changes added high runtime overhead;
+(ii) not all types of memory can be recovered in a rollback, like non-idompotent actions (i.e. I/O, semaphores, condition signals, etc.) and shared libraries state.
+We believe these are hard limitations to overcome and we think our approach to throw deadlock exception gives more advantages in practice.
