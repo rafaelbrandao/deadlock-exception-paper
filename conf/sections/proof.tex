@@ -96,6 +96,8 @@ each thread would have added their conflicting thread on its owned locks's taint
 but none of them would be able to acquire their respective desired locks (as in \emph{item 3}),
 thus leaving their references behind for others to cleanup (as in \emph{item 4}). We minimize this issue by asking other threads to clean these unneeded references as soon as they use any of the locks involved in the deadlock.
 
+We modified OpenJDK \emph{ReentrantLock} to implement this algorithm and its code can be found on our code repository\cite{repo}. We had to omit here details about that implementation for brevity, but our repository contains commits log history describing what changes we did and why we did them.
+
 %\subsection{Implementation}
 %
 %In this subsection we present pseudocode for the proposed protocols, highlighting only the differences we made on \emph{ReentrantLock} to follow the protocols covered previously. The actual code can be found on our github repository \cite{repo}.

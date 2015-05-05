@@ -65,7 +65,7 @@ Initially, we've plotted the box-plot graphic shown in Figure \ref{fig:boxplot} 
 
 \begin{figure}%
     \centering
-    \subfloat[FIrst experiment]{{\includegraphics[width=5cm]{img/u1.png} }}%
+    \subfloat[First experiment]{{\includegraphics[width=5cm]{img/u1.png} }}%
     \qquad
     \subfloat[Second experiment]{{\includegraphics[width=5cm]{img/g1.png} }}%
     \caption{Box-plot on both experiment days}%
@@ -79,13 +79,13 @@ $H_{0}$ & : The model is additive \\
 $H_{1}$ & : $H_{0}$ is $false$ \\
 \end{tabular}
 
-In the first experiment, we obtained a p-value of 0.514, which is not below 0.05 thus we cannot reject $H_{0}$. That means the model was considered to be additive. We had the same conclusion for the second experiment where p-value was 0.914.
+In the first experiment, we obtained a p-value of 0.514, which is not lower than 0.05 thus we cannot reject $H_{0}$. That means the model was considered to be additive. We had the same conclusion for the second experiment where p-value was 0.914.
 
-Finally, we ran the ANOVA (ANalysis Of VAriance) test which compares the effect of treatments on the response variable, providing an approximated p-value for every associated factor. When a variable has \emph{p-value} $< 0.05$, it means that factor was significant to the response.
+Finally, we ran the ANOVA (ANalysis Of VAriance) test which compares the effect of treatments on the response variable, providing an approximated p-value for every associated factor. When a variable has \emph{p-value} $< 0.05$, it means that factor was significant to the response. We can see from Table \ref{tab:unova1} and Table \ref{tab:unova2} the most important factor was indeed the type of \emph{Lock} for both experiments, thus allowing us to reject our null hypothesis defined for {\bf RQ1}.
 
-\begin{table}
+\begin{table}%
 \begin{center}
-\caption{First experiment ANOVA results.}
+\caption{First experiment ANOVA results.}\label{tab:unova1}
 \begin{tabular}{|l|l|l|l|l|ll|}
 \hline
                 & Df &    Sum Sq  &  Mean Sq   & F value & \emph{p-value} &     \\  
@@ -100,9 +100,9 @@ Residuals       & 14 & 2.3340e+37 & 1.6671e+36 &         &           &     \\
 \end{center}
 \end{table}
 
-\begin{table}
+\begin{table}%
 \begin{center}
-\caption{Second experiment ANOVA results.}
+\caption{Second experiment ANOVA results.}\label{tab:unova2}
 \begin{tabular}{|l|l|l|l|l|ll|}
 \hline
                  & Df &    Sum Sq &   Mean Sq  & F value &   Pr(>F) & \\   
@@ -117,8 +117,6 @@ Residuals        & 6 &  181610625 &   30268438 &         &           &     \\
 \end{tabular}
 \end{center}
 \end{table}
-
-We can see that \emph{Lock} factor was the most significant to the response for both experiments, allowing us to reject our null hypothesis defined for {\bf RQ1}.
 
 \subsubsection{Accuracy Analysis.}
 
