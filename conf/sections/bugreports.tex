@@ -1,6 +1,6 @@
 \section{Bug Reports Study}
 
-In Lu et al.'s study about concurrency bugs \cite{lu}, they found that 30 out of 31 deadlock cases involved at most two resources. We decided to investigate this further, focusing on deadlock related bugs.
+In order to build an efficient deadlock detection in runtime we had to understand what was the most usual type of deadlock (if any) and focus on it rather than the general case. Previous study found that 30 out of 31 deadlock bug reports described deadlocks that involved at most two resources \cite{lu}. We suspected that deadlocks between two threads and two locks were indeed more common in the real world so we investigated it further. We started a bug reports study focusing on deadlock related bugs only in different open-source projects and obtained bigger sample. This section will mainly cover how we collected the data, how the data was labelled, and what results we have found.
 
 \subsection{Data Collection}
 
