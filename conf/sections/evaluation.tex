@@ -30,8 +30,8 @@ We ran this experiment with two groups in two different days. First group consis
 
 \subsubsection{Time Analysis.}
 
-We defined the following hypothesis to answer {\bf RQ1}. We used Latin Square Design to control two factors that might affect the metrics: subjects and program complexity.
-Program complexity we define as the amount of files in the program, number of threads and number of locks to analyze. We wanted to have one program that we considered easy to identify the bug even without exceptions and another program that was more difficult, composed by many files and classes and reflecting a more realistic case. We provided implementations of each program using either \emph{LockA} or \emph{LockB}: the two possible treatments that we want to compare. Since we had N subjects, 2 programs and 2 possible treatments, we disposed subjects in rows and programs in columns of latin squares, randomly assigning in each cell of the square a treatment that could be \emph{LockA} or \emph{LockB}, but also guaranteeing that for any given row or column in this square, each treatment appears only once. Consequently, we have replication, local control and randomization which are the three principles of experiment design \cite{box}. Time analysis was conducted with R Statistical Software using the inputs extracted from each day. We used the linear model described in Figure 1 that considers the effect of different factors on the response variable similarly to Accioly \cite{paola}, adding the effect between each replica and treatment as explained by Sanchez \cite{sanchez}.
+We defined the hypothesis to answer {\bf RQ1}. We used Latin Square Design to control two factors that might affect the metrics: subjects and program complexity.
+Program complexity we define as the amount of files in the program, number of threads and number of locks to analyze. We wanted to have one program that we considered easy to identify the bug even without exceptions and another program that was more difficult, composed by many files and classes and reflecting a more realistic case. We provided implementations of each program using either \emph{LockA} or \emph{LockB}: the two possible treatments that we want to compare. Since we had N subjects, 2 programs and 2 possible treatments, we disposed subjects in rows and programs in columns of latin squares, randomly assigning in each cell of the square a treatment that could be \emph{LockA} or \emph{LockB}, but also guaranteeing that for any given row or column in this square, each treatment appears only once. Consequently, we have replication, local control and randomization which are the three principles of experiment design \cite{box}. Time analysis was conducted with R Statistical Software using the inputs extracted from each day. We used the linear model described in Figure~\ref{fig:model} that considers the effect of different factors on the response variable similarly to Accioly's work\cite{paola}, adding the effect between each replica and treatment \cite{sanchez}.
 
 \begin{equation}
   H_{0} : \mu_{TimeLockA} \geq \mu_{TimeLockB}
@@ -53,7 +53,7 @@ $\gamma_{k}$ & - effect of $k_{th}$ lock \\
 $\tau\gamma_{lk}$ & - effect of interaction between $l_{th}$ replica and $k_{th}$ lock \\
 $\epsilon_{lijk}$ & - random error \\
 \end{tabular}
-\caption{Regression model.}
+\caption{Regression model.}\label{fig:model}
 \end{center}
 \end{figure}
 
