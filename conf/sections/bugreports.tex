@@ -1,6 +1,6 @@
 \section{Bug Reports Study}\label{bugs}
 
-Attempting to generalize deadlock detection at runtime does not seem feasible from a performance viewpoint, since existing dynamic analyses take considerable time~\cite{magicfuzzer}. A previous study~\cite{lu} that analyzed a number of concurrency bugs found that 30 out of 31 deadlock bug reports described deadlocks that involved at most two resources. We suspected that TTTL deadlocks were indeed much more common in real world systems than more complex deadlocks, so we investigated this further. This section presents the results of this investigation. 
+Attempting to generalize deadlock detection at runtime does not seem feasible from a performance viewpoint, since existing dynamic analyses take considerable time~\cite{magicfuzzer}. But previous bug reports study~\cite{lu} found that 30 out of 31 deadlock bug reports involved at most two resources. We suspected that TTTL deadlocks were indeed much more common in real world systems than more complex deadlocks, so we investigated this further. This section presents the results of this investigation.
 
 \subsection{Data Collection}
 
@@ -12,7 +12,7 @@ In OpenJDK, we found 108 issues of type "bug" on module "JDK" with resolution "f
 
 \subsection{Data Labeling}
 
-We defined a set of fields to classify for each bug analyzed in the sample. First, we define a category. Then complete other fields based on how much we could understand of each bug report, like the number of threads involved, number of resources involved, type of locking mechanism used, and so on. Some extra information we collected was not used for this research.
+We defined a set of fields to classify for each bug analyzed in the sample. First, we define a category. Then complete other fields based on how much we could understand of each bug report, like the number of threads involved, number of resources involved, type of locking mechanism used, and so on.
 
 We have four different values for the category field.
 Category \emph{A} indicates that  we are confident this is a resource deadlock. Thus, we should be able to describe the number of threads and locks that were involved.
@@ -20,13 +20,9 @@ In contrast, category \emph{B} represents the opposite: it is certainly not a re
 Category \emph{C} refers to all the false-positive results: the term \emph{deadlock} was used as a synonym of "hanging" or an "infinite loop", or to just mention another deadlock bug as a reference, not as a cause of the current bug.
 Lastly, category \emph{D} is set for all bugs that we could not understand clearly, due to a lack of evidence or discussion.
 
-%%Some other optional but also relevant fields are "type" and "notes". Field "type" determines what locking mechanism a certain bug have used. For instance if we used "locks/synchronized", it means we were sure it was a resource deadlock but not sure if only synchronized blocks or explicit locks were used. When a plus sign (+) was used, it means we want to split each thread and classify them individually. For example, if type was "locks + wait" it means that one thread holds an explicit lock while the other waits either in a loop checking a flag or for a signal coming from notify. Since this annotation is not well defined, we added field "notes" which was used to put more details about the bug and clarify this annotation.%%
-
-%The labeling process had a set of guidelines which described each step of investigating a bug and where to look for the information we needed on each bug, like attachments, comments, duplicate bugs, and so on. We omit these guidelines here for brevity.
-
 \subsection{Results Analysis}
 
-Initially we  consider only bugs we clearly identified, that is, bugs that were not labeled as category D.
+Initially we consider only bugs we clearly identified, that is, bugs that were not labeled as category D.
 In Table~\ref{tab:categ} (second column), we can see in that from all resource deadlocks, 92.07\% of them are indeed TTTL deadlocks.
 Another interesting finding is that 75.93\% of all deadlocks are indeed resource deadlocks.
 
@@ -49,8 +45,6 @@ D & 69 & 0 \\
 
 If we now consider bugs we could not clearly classify, we can make some estimations of how many of them would be resource deadlocks and TTTL deadlocks. The first estimate is the worse case scenario, that is, all bugs in category D should be in category A but none of them would be TTTL deadlocks. In this case, only 54.7\% of resource deadlocks would be TTTL deadlocks. If we look at the best case scenario, that is, all bugs in D would be TTTL deadlocks, then it would be 95.29\% instead. However none of these two scenarios seems realistic. We believe that a more realistic scenario would be to assume that bugs in category D are distributed roughly in the same way as those in categories A, B, and C. If that is the case (last column of Table~\ref{tab:categ}), out of all resource deadlocks, we estimate that 91.7\% of them would also be TTTL deadlocks. Thus TTTL deadlocks are certainly the most popular type of resource deadlocks, amounting to more than 9 out of every 10 resource deadlocks. This result makes it evident that an approach to automatically detect these deadlocks has practical value.  
 
-%Also, we saw that resource deadlocks are indeed more popular than communication deadlocks. Then if we focus on detecting TTTL deadlocks only, we would still cover most of the cases and at the same time optimize the code to detect it with as low overhead as possible.
-
 \subsection{Threats to Validity}
 
-Only one of the authors labeled all bug reports due to constraints on time and lack of resources. In counterpart, having only one reviewer makes it easier to guarantee that all bug reports were reviewed following the exact same procedure, but we would have preferred to have at least one more reviewer to label each bug independently and use it as a way to double check the labels accuracy. Furthermore, one factor that might limit generalization of these findings is that we have looked at only three different open-source projects written mostly in Java, but different programming languages may have different distribution of deadlock bugs.
+Only one of the authors labeled all bug reports due to constraints on time and lack of resources. In counterpart, having only one reviewer makes it easier to guarantee that all bug reports were reviewed following the exact same procedure, but we would have preferred to have at least one more reviewer to label each bug independently and use it as a way to double check the labels accuracy. Furthermore, one factor that might limit generalization of these findings is that all projects we looked were written in Java and different programming languages may have different distribution of deadlock bugs.
