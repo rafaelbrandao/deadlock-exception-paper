@@ -15,7 +15,7 @@ We have modified the default implementation of Java's \emph{ReentrantLock} to al
 \item Otherwise, the thread will set itself as the current owner of that lock and also add this lock to its thread-local list of pointers of locks it owns.
 \end{enumerate}
 \item When a thread is about to release a lock, the current owner pointer of that lock is set to {\tt null} and that lock is also removed from the thread-local list of owned locks. Finally, the lock state is changed to \emph{unlocked}.
-\item Before parking, a thread will check whether there is a deadlock. When the current thread is unable to acquire its desired lock, it must be because another thread already owns it. It is possible to know who is the owner of any lock, so the current thread identifies the owner of its desired lock as the conflicting thread. Then the current thread will search on each lock of its thread-local list of owned locks if the conflicting thread is waiting on it.
+\item Before parking, a thread will check whether there is a deadlock. When the current thread is unable to acquire its desired lock, it must be because another thread already owns it. It is possible to know who is the owner of any lock, so the current thread identifies the owner of its desired lock as the conflicting thread. Then the current thread will search on each lock of its list of owned locks if the conflicting thread is waiting for it.
 \begin{enumerate}
 \item If positive, then we have a circular dependency (current thread is stuck waiting for its desired lock and the conflicting thread is stuck waiting for a lock the current thread owns) and thus a deadlock exception will be raised.
 \item Otherwise, the thread parks.
@@ -105,7 +105,7 @@ We minimize this issue by cleaning these references as soon as any thread acquir
 
 \subsection{Implementation}
 
-We modified OpenJDK \emph{ReentrantLock} to implement this algorithm and its code can be found in our code repository in \cite{repo}. We had to omit details about that implementation here for brevity, but our repository contains commits log history describing what changes we did and why we did them.
+The modified OpenJDK \emph{ReentrantLock} version to implement this algorithm is available in our code repository~\cite{repo}. Further implementation details were omitted here for brevity.
 
 
 

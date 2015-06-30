@@ -22,7 +22,8 @@ We defined the following hypothesis to answer {\bf RQ1}:
 \end{equation}
 
 We used Latin Square Design~\cite{box} to control two factors that might affect the metrics: subjects and program complexity.
-We designed one program where we considered it easy to identify the bug even without exceptions and another program that was more difficult, composed by many files and classes and reflecting a more realistic case. We provided implementations of each program using either \emph{LockA} or \emph{LockB}: the two possible treatments we wanted to compare. Since we had N subjects, 2 programs and 2 possible treatments, we disposed subjects in rows and programs in columns of latin squares, randomly assigning in each cell of the square a treatment that could be \emph{LockA} or \emph{LockB}, but also guaranteeing that for any given row or column in this square, each treatment appeared only once. Consequently, we have replication, local control and randomization which are the three principles of experiment design \cite{box}. Time analysis was conducted with R Statistical Software using the inputs extracted from each day. We used the linear model described in Figure~\ref{fig:model} that considers the effect of different factors on the response variable similarly to Accioly's work\cite{paola}, adding the effect between each replica and treatment \cite{sanchez}.
+Programs \emph{Bank} and \emph{Eclipse} had complexity easy and difficult respectively, while \emph{LockA} and \emph{LockB} were the two possible treatments we wanted to compare.
+Since we had N subjects, 2 programs and 2 possible treatments, we disposed subjects in rows and programs in columns of latin squares, randomly assigning in each cell of the square a treatment that could be \emph{LockA} or \emph{LockB}, but also guaranteeing that for any given row or column in this square, each treatment appeared only once. Consequently, we have replication, local control and randomization which are the three principles of experiment design \cite{box}. Time analysis was conducted with R Statistical Software using the inputs extracted from each day. We used the linear model described in Figure~\ref{fig:model} that considers the effect of different factors on the response variable similarly to Accioly's work\cite{paola}, adding the effect between each replica and treatment \cite{sanchez}.
 
 \begin{figure}
 \begin{center}
@@ -41,7 +42,7 @@ $\epsilon_{lijk}$ & - random error \\
 \end{center}
 \end{figure}
 
-Initially, we plotted box-plot graphics shown in Figure~\ref{fig:boxplot} for both experiments. Then we run Box-Cox transformation to reduce anomalies such as non-additivity and non-normality. The value of $\lambda$ at the maximum point in the curve drawn by box-cox function in R was not approximately 1 ($\lambda = 5$), thus we should apply the transformation: on our regression model, $Y_{lijk}$ should be powered to $\lambda$. We did the same on the second experiment as $\lambda = 1.3636$.
+Initially, we plotted box-plot graphics shown in Figure~\ref{fig:boxplot} for both experiments. Then we ran Box-Cox transformation to reduce anomalies such as non-additivity and non-normality. The value of $\lambda$ at the maximum point in the curve drawn by box-cox function in R was not approximately 1 ($\lambda = 5$), thus we should apply the transformation: on our regression model, $Y_{lijk}$ should be powered to $\lambda$. We did the same on the second experiment as $\lambda = 1.3636$.
 
 \begin{figure}%
     \centering
