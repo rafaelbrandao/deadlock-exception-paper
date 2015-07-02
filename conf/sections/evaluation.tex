@@ -23,7 +23,7 @@ We defined the following hypothesis to answer {\bf RQ1}:
 
 We used Latin Square Design~\cite{box} to control two factors that might affect the metrics: subjects and program complexity.
 Programs \emph{Bank} and \emph{Eclipse} had complexity easy and difficult respectively, while \emph{LockA} and \emph{LockB} were the two possible treatments we wanted to compare.
-Since we had N subjects, 2 programs and 2 possible treatments, we disposed subjects in rows and programs in columns of latin squares, randomly assigning in each cell of the square a treatment that could be \emph{LockA} or \emph{LockB}, but also guaranteeing that for any given row or column in this square, each treatment appeared only once. Consequently, we have replication, local control and randomization which are the three principles of experiment design \cite{box}. Time analysis was conducted with R Statistical Software using the inputs extracted from each day. We used the linear model described in Figure~\ref{fig:model} that considers the effect of different factors on the response variable similarly to Accioly's work\cite{paola}, adding the effect between each replica and treatment \cite{sanchez}.
+Since we had N subjects, 2 programs and 2 possible treatments, we disposed subjects in rows and programs in columns of latin squares, randomly assigning in each cell of the square a treatment that could be \emph{LockA} or \emph{LockB}, but also guaranteeing that for any given row or column in this square, each treatment appeared only once. Consequently, we have replication, local control and randomization which are the three principles of experiment design \cite{box}. Time analysis was conducted with R Statistical Software using the inputs extracted from each day. We used the linear model described in Figure~\ref{fig:model} that considers the effect of different factors on the response variable as proposed by other authors~\cite{paola}, including the effect between each replica and treatment~\cite{sanchez}.
 
 \begin{figure}
 \begin{center}
@@ -42,7 +42,7 @@ $\epsilon_{lijk}$ & - random error \\
 \end{center}
 \end{figure}
 
-Initially, we plotted box-plot graphics shown in Figure~\ref{fig:boxplot} for both experiments. Then we ran Box-Cox transformation to reduce anomalies such as non-additivity and non-normality. The value of $\lambda$ at the maximum point in the curve drawn by box-cox function in R was not approximately 1 ($\lambda = 5$), thus we should apply the transformation: on our regression model, $Y_{lijk}$ should be powered to $\lambda$. We did the same on the second experiment as $\lambda = 1.3636$.
+Initially, we plotted box-plot graphics shown in Figure~\ref{fig:boxplot} for both experiments and calculated the means for time spent in Table~\ref{tab:mean1} and Table~\ref{tab:mean2}, where we can observe that students finished the exercise faster on the average when using our approach: 16.87\% less time on the first group and 30.70\% less on the second group. Then we ran Box-Cox transformation to reduce anomalies such as non-additivity and non-normality. The value of $\lambda$ at the maximum point in the curve drawn by box-cox function in R was not approximately 1 ($\lambda = 5$), thus we should apply the transformation: on our regression model, $Y_{lijk}$ should be powered to $\lambda$. We did the same on the second experiment as $\lambda = 1.3636$.
 
 \begin{figure}%
     \centering
@@ -52,6 +52,34 @@ Initially, we plotted box-plot graphics shown in Figure~\ref{fig:boxplot} for bo
     \caption{Box-plot on both experiment days}\label{fig:boxplots}%
     \label{fig:boxplot}%
 \end{figure}
+
+\begin{table}
+\parbox{.45\linewidth}{
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+ & Time Spent (mean)\\
+\hline
+LockA & 4227.800 seconds \\
+LockB & 5086.367 seconds \\
+\hline
+\end{tabular}
+\caption{First group's time spent}\label{tab:mean1}
+}
+\hfill
+\parbox{.45\linewidth}{
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+ & Time Spent (mean)\\
+\hline
+LockA & 1737.714 seconds \\
+LockB & 2507.714 seconds \\
+\hline
+\end{tabular}
+\caption{Second group's time spent}\label{tab:mean2}
+}
+\end{table}
 
 After applying Box-Cox transformation, we ran Tukey Test of Additivity that checks whether effect model is additive. If the model was additive, then rows and columns of each latin square wouldn't affect significantly the response \cite{box}. Now consider the hypothesis where the null hypothesis ($H_{0}$) says the model is additive and alternative hypothesis ($H_{1}$) says the opposite. In the first experiment, model was additive as we obtained p-value of 0.514 which is not lower than 0.05 and we couldn't reject $H_{0}$; similarly for the second experiment, the model was also additive as p-value found was 0.914.
 
@@ -114,7 +142,7 @@ LockA & 29 & 2\\
 LockB & 16 & 15\\
 \hline
 \end{tabular}
-\caption{First group accuracy}\label{tab:accuracy1}
+\caption{First group's accuracy}\label{tab:accuracy1}
 }
 \hfill
 \parbox{.45\linewidth}{
@@ -127,12 +155,12 @@ LockA & 13 & 1\\
 LockB & 10 & 4\\
 \hline
 \end{tabular}
-\caption{Second group accuracy}\label{tab:accuracy2}
+\caption{Second group's accuracy}\label{tab:accuracy2}
 }
 \end{table}
 
 To compare the accuracy of the subjects using Java's regular {\tt ReentrantLock} and our modified implementation, we employed Fisher's exact test \cite{agresti}. We could not use ANOVA because the data for accuracy is categorical (Correct vs. Incorrect) instead of numerical. 
-Applying Fisher's exact test on data from Table~\ref{tab:accuracy1} and Table~\ref{tab:accuracy2}, we can see that undergraduate students results presented a two-tailed P value equals 0.0004: the association between rows (groups) and columns (outcomes) was considered to be extremely statistically significant; consequently, it suggests that an improvement on accuracy occurred due to the use of the proposed approach. However graduate students results presented a two-tailed P value equals 0.3259, which does not represent statistically significant evidence.
+Applying Fisher's exact test on data from Table~\ref{tab:accuracy1} and Table~\ref{tab:accuracy2}, we can see that undergraduate students results presented a two-tailed P value equals 0.0004: the association between rows (groups) and columns (outcomes) was considered to be extremely statistically significant; consequently, it suggests that an improvement on accuracy occurred due to the use of the proposed approach, where it had 81.25\% more correct answers. However graduate students results only had 30\% more correct answers with a two-tailed P value equals 0.3259, which does not represent statistically significant evidence.
 
 Although we cannot draw strong conclusions regarding improved accuracy, we found some interesting behavior. Some students in the second group were greatly experienced on concurrent programming and they knew how to efficiently find a deadlock using the tools available in their IDE of choice, thus being able to finish the tasks really quickly for both problems. This observation allows us to hypothetize that deadlock exceptions are more helpful for less experienced programmers, but we leave investigation of this matter for future work.
 
