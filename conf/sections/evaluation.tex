@@ -42,7 +42,7 @@ $\epsilon_{lijk}$ & - random error \\
 \end{center}
 \end{figure}
 
-Initially, we plotted box-plot graphics shown in Figure~\ref{fig:boxplot} for both experiments and calculated the means for time spent in Table~\ref{tab:mean1} and Table~\ref{tab:mean2}, where we can observe that students finished the exercise faster on the average when using our approach: 16.87\% less time on the first group and 30.70\% less on the second group. Then we ran Box-Cox transformation to reduce anomalies such as non-additivity and non-normality. The value of $\lambda$ at the maximum point in the curve drawn by box-cox function in R was not approximately 1 ($\lambda = 5$), thus we should apply the transformation: on our regression model, $Y_{lijk}$ should be powered to $\lambda$. We did the same on the second experiment as $\lambda = 1.3636$.
+Initially, we plotted box-plot graphics shown in Figure~\ref{fig:boxplots} for both experiments and calculated the means for time spent in Table~\ref{tab:mean1} and Table~\ref{tab:mean2}, where we can observe that students finished the exercise faster on the average when using our approach: 16.87\% less time on the first group and 30.70\% less on the second group. Then we ran Box-Cox transformation to reduce anomalies such as non-additivity and non-normality. The value of $\lambda$ at the maximum point in the curve drawn by box-cox function in R was not approximately 1 ($\lambda = 5$), thus we should apply the transformation: on our regression model, $Y_{lijk}$ should be powered to $\lambda$. We did the same on the second experiment as $\lambda = 1.3636$.
 
 \begin{figure}%
     \centering
@@ -50,7 +50,6 @@ Initially, we plotted box-plot graphics shown in Figure~\ref{fig:boxplot} for bo
     \qquad
     \subfloat[Second experiment]{{\includegraphics[width=5cm,natwidth=488,natheight=303]{img/g1.png} }}%
     \caption{Box-plot on both experiment days}\label{fig:boxplots}%
-    \label{fig:boxplot}%
 \end{figure}
 
 \begin{table}
