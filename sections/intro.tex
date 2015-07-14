@@ -1,43 +1,58 @@
 \section{Introduction}
 
-Real-world applications use concurrency to parallelize computation in multiple threads or processes, taking more advantage of multicore processors.
-However concurrenct code is difficult to write correctly, as it is well documented in \cite{lu}. In a concurrent code, for example, a developer must
-take in consideration all possible interleaves that multiple threads in the running code can take which is simply not feasible.
-When multiple threads access concurrently a certain memory position, data races may occur.
-One way to solve this problem is to first identify parts of the code that should not allow threads to run simultaneously -- they are
-called critical sections -- and then protect them by using locks. 
+Real-world applications use concurrency to take the more advantage of multicore processors and do computation in parallel using multiple threads/processes.
+However concurrent code is difficult to write correctly, as it is well documented~\cite{lu}.
+In a concurrent code, for example, a developer must take in consideration all possible interleaves that multiple threads in the running code can take which is usually not feasible, and when multiple threads read and write concurrently a certain value in memory, data races may occur.
+Identifying parts of code that should not allow concurrent threads to run simultaneously is one step forward solving the problem.
+These areas are known as critical sections and one way to prevent such data races is to protect them with locks.
 
-Locks are used to avoid data races in concurrent code. When a thread acquires a certain lock, no other thread can acquire the same lock.
-Any thread that attempt to acquire that lock will be blocked until that resource is released. Once that thread finishes to execute critical code,
-it should release that lock so other threads would be unblocked afterwards.
+Lock is a synchronization mechanism that enforce mutual exclusion policy over threads for any given resource.
+Threads attempting to acquire a lock that was already acquired by other thread will be blocked until that resource is released. 
+Only the owner of the lock can release that lock and unblock others, so usually a thread releases it when it finishes to execute code in a critical section, allowing other threads to proceed.
+They are widely used to protect critical zones, thus avoiding data races in concurrent code.
+However a problem introduced by badly composing locks is known as deadlock~\cite{pyla}.
 
-Unfortunately locks cannot be easily composed in the code and a very common bug caused by composing locks in unexpected ways is called deadlock.
-A deadlock manifests when threads are waiting each other in a cycle, each one holding locks that other thread is trying to acquire.
+Deadlocks are a very common type of error in concurrent systems~\cite{lu}.
+They manifest when threads are waiting each other in a cycle, where each thread is waiting for another thread to release its desired lock, producing a never-ending wait.
 
-Suppose a thread X acquires a lock A and then tries to acquire a lock B. Given the nature of parallelism, another thread Y simultaneously acquires
-a lock B and then tries to acquire lock A. Since thread X is blocked waiting for lock B to be released and thread Y which owns lock B is blocked
-waiting for thread X to release lock A, both will never finish waiting, thus creating a deadlock. When a deadlock happens, a program fail
-to make progress without notice to users and developers, making harder to identify the problem.
+There are two well-documented types of deadlocks, resource deadlocks and communication deadlocks~\cite{singhal}\cite{knapp}.
+Resource deadlocks are deadlocks that stem from threads attempting to obtain exclusive access to resources.
+Communication deadlocks are deadlocks caused by at least one thread waiting for any kind of signal that either never arrives or arrived too early to be detected.
+As other studies did~\cite{mcsdk}\cite{magicfuzzer}, in this work our focus is also on resource deadlocks and whenever the term \emph{deadlock} is used we will implicitly mean resource deadlock.
 
-Deadlocks can be avoided if locks are acquired in any order, as long as the other threads follows that particular order. For example, if both thread X
-and thread Y always acquired locks A and B in this order, then no deadlock could ever occur because there's no waiting relationship cycle between them. 
-Some existing techniques to avoid deadlock require to impose a global order on locks and check whether this order is ever violated when the locks are acquired \cite{marino},
-but this approach is not practical for real world software because most of the time the code that acquires the first lock is unaware of wh.
+In practice, developers employ a number of approaches to deal with deadlocks:
+\begin{itemize}
+\item Static program analyses \cite{marino}\cite{dawson}\cite{vivek}\cite{williams};
+\item Dynamic program analyses \cite{mcsdk}\cite{magicfuzzer}\cite{sammati}\cite{serenity}\cite{pyla}\cite{rx};
+\item Application-specific deadlock detection infrastructu\-res \cite{orderedlock};
+\item Techniques to guarantee the absence of deadlocks by construction \cite{marino};
+\item Model checking \cite{havelund}.
+\end{itemize}
+The first two approaches are known to be heavyweight. In addition, the former often produces many false positives.
+The third approach has limited applicability and often imposes a high runtime overhead.
+The fourth approach has a low cost but cannot be employed in cases where it is not feasible to order lock acquisitions nor use non-blocking locking primitives.
+Finally, model checking is a powerful solution but has limited scalability when applied in the context of real programs. It also has limited generality, since some programs with side effects simply cannot be model checked.
 
-There are two main types of deadlocks: resource deadlocks and communication deadlocks \cite{singhal} \cite{knapp}. Resource deadlocks are illustrated in the previous
-example, where threads wait for resources to become available. Communication deadlocks happens when threads are blocked waiting messages, so messages are the resources
-for which threads wait. In this work, as other studies did before \cite{mcsdk} \cite{magicfuzzer}, our focus will be on resource deadlocks and from now on and whenever the term \emph{deadlock} is used by itself we will be referring to resource deadlocks unless mentioned otherwise.
+In this paper we advocate an approach that complements the aforementioned ones.
+In summary, we believe deadlocks should not fail silently but instead their occurrence should be signaled as exceptions at runtime.
+To make this vision possible, we leverage two insights:
+\begin{itemize}
+\item The vast majority of existing deadlocks occur between two threads attempting to acquire two locks (as reported by other authors~\cite{lu} and confirmed by us in Section~\ref{bugs});
+\item It is possible to efficiently introduce deadlock detection for these two-thread, two-lock deadlocks (TTTL deadlocks) within the locking mechanism itself, incurring in an overhead that is low for applications whose execution time is not dominated by locking.
+\end{itemize}
+We present a new type of lock that automatically checks for TTTL deadlocks at runtime and, if one is found, throws an exception indicating the problem.
+We have implemented this approach as an extension to Java's {\tt ReentrantLock} class.
+Deadlock exceptions are already supported in programming languages such as Haskell \cite{marlow} and Go \cite{golang} but they focus on different types of deadlocks, and runtime exceptions for other concurrency bugs, e.g., for data races, have been proposed in previous studies~\cite{valor}.
 
-Over the time, many studies tried to solve deadlock by detecting them in many different ways which can be made by either static analysis, dynamic analysis, or a mix of them. Static analysis leverage deadlock existence by reading the source code and estimating whether a deadlock would be possible with that code without actually running it. In counter part, dynamic analysis dynamically add extra code in the original source and possibly detect real deadlocks during execution. But each one of those techniques
-have its own advantages and disadvantages and they complement one another.
-
-In this study, however, we are focusing on solving deadlocks differently. We believe deadlocks should not fail silently but instead they should be handled as exceptions in programming languages. Rather than trying to detect them when explicitly requested for a deadlock analysis, programs should instead be written in such a way that they can either handle the deadlock when it happens by deploying some custom deadlock recovery logic or just show the error in the output in order to ease finding bugs and solving them later.
-
-There are some programming languages such as Haskell and Go that already contain some kind of deadlock exception for very particular cases. In this study, the proposed deadlock exception was focused on what we've found out to be the most common type of deadlock: the classical deadlock illustrated in the previous example where only two threads are involved and they're waiting circularly for two resources.
+We present data from an empirical study showing that our assumption about the prevalence of TTTL deadlocks holds in practice. It confirms the findings of a previous study that focused on concurrency bugs in general~\cite{lu}. 
+To evaluate our approach, we conducted two controlled experiments. In both cases, subjects using these new locks were able to detect deadlocks significantly faster than subjects not using them.  Furthermore, in one of the studies, this approach helped the subjects to more accurately identify the causes of the deadlock. We also show that our approach has an overhead that, while non-negligible, is low for applications whose execution time is not dominated by locking.
 
 \subsection{Summary of Goals}
 
-In this work we have the main goal to show how deadlock detection between two threads and two locks can be implemented with very low runtime overhead and evaluate the impact of deadlock exceptions on the efficiency of identifying deadlocks in software by running an empirical study with students. With this contribution, we seek to understand the benefits of such exceptions in programming languages and also offer a lightweight implementation of deadlock exceptions that can seamlessly run on top of Java OpenJDK.
+In this work we want to accomplish the following goals:
+(i) verify that TTTL deadlocks are the most common type of deadlock in practice;
+(ii) present a solution for TTTL deadlock detection that can be implemented with significantly low overhead;
+and (iii) evaluate deadlock exceptions' impact on software development productivity, such as finding deadlocks in code and understanding how they happen more accurately.
 
 \subsection{Outline}
 
@@ -47,8 +62,8 @@ The remainder of this work will be organized as follows:
 \begin{itemize}
   \item Chapter 2 discuss the basic concepts of deadlock exceptions, highlighting previous studies and terms that are necessary to understand before proceeding to the next chapters.
   \item Chapter 3 presents our study on bug reports in open source projects, focusing on deadlock bugs and identifying some of its characteristics.
-  \item Chapter 4 shows our deadlock detection algorithm in details, presenting a sketch of a formal proof, what changes were done to Java's ReentrantLock and a quick performance evaluation.
-  \item Chapter 5 discuss the empiric evaluation we did to measure efficiency of deadlock exceptions on identifying bugs in software.
+  \item Chapter 4 shows our deadlock detection algorithm in details with a sketch of a proof and what changes were done to Java's \emph{ReentrantLock} source code available on OpenJDK repository.
+  \item Chapter 5 discuss the empiric evaluation we did to measure efficiency of deadlock exceptions and a brief performance analysis of runtime overhead.
   \item Chapter 6 presents the contributions of this work, discusses some related and future work, and presents our main conclusions.
   \item Appendix A shows the code used to calculate the size of sample we've used in Chapter 3.
   \item Appendix B shows the code used to analyse the data collected in Chapter 3.

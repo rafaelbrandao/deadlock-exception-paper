@@ -1,6 +1,14 @@
 \begin{abstract}
+Deadlocks are a common type of concurrency bug.
+When a deadlock occurs, it is difficult to clearly determine whether there is an actual deadlock or if the application is slow or hanging due to a different reason. It is also difficult to establish the cause of the deadlock.
+In general, developers deal with deadlocks by using analysis tools, introducing application-specific deadlock detection mechanisms, or simply by using techniques to avoid the occurrence of deadlocks by construction.
+In this paper we propose a different approach. We believe that if deadlocks manifest at runtime, as exceptions, programmers will be able to identify these deadlocks in an accurate and timely manner.
+We leverage two insights to make this practical:
+(i) most deadlocks occurring in real systems involve only two threads acquiring two locks (TTTL deadlocks);
+and (ii) it's possible to detect TTTL deadlocks efficiently enough for most practical systems.
+We conducted a study on bug reports and found that more than 90\%  of identified deadlocks were indeed TTTL.
+We extended Java's {\tt ReentrantLock} class to detect TTTL deadlocks and measured the performance overhead of this approach with a conservative benchmark. For applications whose execution time is not dominated by locking, the overhead is estimated as below 6\%.
+Empirical usability evaluation in two experiments showed that students finished tasks 16.87\% to 30.7\% faster on the average using our approach with the lock being the most significant factor behind it, and, in one of the experiments answers were significantly more accurate (81.25\% more correct bugs found).
 
-Concurrent programming has been challenging developers over decades with their bugs, as they are very difficult to find and reproduce. Deadlocks are very common types of concurrency bugs, happening when locks are used to keep critical zones safe from multiple threads interference. However, even when a deadlock bug is reproduced, it's very difficult to clearly say if there's an actual deadlock or if the application is slow or hanging for a different reason. To solve this problem, we believe that if deadlocks were handled as exceptions, programmers would accurately identify them faster, reducing the amount of time until it is fixed. Some programming languages, such as Haskell and Go, already provides this concept for specific cases of deadlocks. In this work, we've searched for deadlock bugs in three different open-source projects and we confirmed which type of deadlock is the most popular: the one where only two threads are stuck waiting circularly for each other. Then, we've modified Java's \emph{ReentrantLock} implementation to throw a runtime exception when a classic deadlock happens and provided a sketch of a proof to explain why it should work. Finally, we've measured how it positively affects programmers's speed to identify bugs in the code and their accuracy on why a deadlock happened.
-
-\keywords{lock, concurrency bugs, deadlock, runtime exception}
+\keywords{deadlock, concurrency, exception handling, empirical studies}
 \end{abstract}
