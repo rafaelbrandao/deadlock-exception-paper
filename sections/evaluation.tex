@@ -114,13 +114,13 @@ Initially, we've plotted the box-plot graphic shown in Figure~\ref{fig:boxplot1}
 \caption{First experiment box-plot graphic.}\label{fig:boxplot1}
 \end{figure}
 
-Then we've run the Box-Cox transformation - which is a power transformation - to reduce anomalies such as non-addivity and non-normality, obtaining the curve in the left of Figure 3. Since the value of $\lambda$ at the maximum point in the curve is not approximately 1, we should apply the transformation; that is, $Y_{lijk}$ should be powered to that $\lambda$ on our regression model. Running the same analysis again with the transformed model, we obtain the curve shown in the right of Figure 3.
+Then we've run the Box-Cox transformation - which is a power transformation - to reduce anomalies such as non-addivity and non-normality, obtaining the curve in the left of Figure~\ref{fig:transf1}. Since the value of $\lambda$ at the maximum point in the curve is not approximately 1, we should apply the transformation; that is, $Y_{lijk}$ should be powered to that $\lambda$ on our regression model. Running the same analysis again with the transformed model, we obtain the curve shown in the right of Figure~\ref{fig:transf1}.
 
 \begin{figure}
 \includegraphics[height=4.5cm, width=6cm]{img/u2.png}
 \hfill
 \includegraphics[height=4.3cm, width=6cm]{img/u2boxcox.png}
-\caption{First experiment: before and after box-cox transformation ($\lambda = 5$).}
+\caption{First experiment: before and after box-cox transformation ($\lambda = 5$).}\label{fig:transf1}
 \end{figure}
 
 After applying Box-Cox transformation, we ran Tukey Test of Additivity that checks whether effect model is additive, so we can evaluate whether interaction between factors displayed on the rows and columns of each latin square won't affect significantly the response when the model is additive \cite{box}; thus, considering the following hypothesis:
@@ -136,7 +136,7 @@ Finally, we ran the ANOVA (ANalysis Of VAriance) test which compares the effect 
 
 \begin{table}
 \begin{center}
-\caption{Undergraduate students experiment ANOVA results.}
+\caption{Undergraduate students experiment ANOVA results.}\label{tab:anova1}
 \begin{tabular}{|l|l|l|l|l|ll|}
 \hline
                 & Df &    Sum Sq  &  Mean Sq   & F value & \emph{p-value} &     \\  
@@ -151,16 +151,16 @@ Residuals       & 14 & 2.3340e+37 & 1.6671e+36 &         &           &     \\
 \end{center}
 \end{table}
 
-In Table 4, we can see that \emph{Lock} factor was the most significant to the response, allowing us to reject our null hypothesis defined in Equation 10.
+In Table~\ref{tab:anova1}, we can see that {\bf lock factor was the most significant to the response}, allowing us to reject our null hypothesis defined in Equation 10.
 
 Now we will show the results collected by the second experiment with graduate students. They were exposed to the same set of problems in a different day, but as explained before, they only had a time limit of 1 hour per question.
 
-When we analyze the box-plot for the second group displayed in Image, we can see there was a clear improvement on the time for students with \emph{LockA}.
+When we analyze the box-plot for the second group displayed in Image~\ref{fig:boxplot2}, we can see there was a clear improvement on the time for students with \emph{LockA}.
 
 \begin{figure}
 \centering
 \includegraphics[height=4.5cm]{img/g1.png}
-\caption{Second experiment box-plot graphic.}
+\caption{Second experiment box-plot graphic.}\label{fig:boxplot2}
 \end{figure}
 
 Moving foward with the analysis, we check if a box-cox transformation is needed. Since the value is not approximately 1, we apply the power transformation the same way we did with the first experiment, but with the corresponding lambda value.
@@ -169,14 +169,14 @@ Moving foward with the analysis, we check if a box-cox transformation is needed.
 \includegraphics[height=4.5cm]{img/g2.png}
 \hfill
 \includegraphics[height=4.4cm]{img/g2boxcox.png}
-\caption{Before and after box-cox transformation ($\lambda = 1.3636$).}
+\caption{Before and after box-cox transformation ($\lambda = 1.3636$).}\label{fig:transf2}
 \end{figure}
 
-Finally, running ANOVA, we can see that the type of lock was the most significant factor for the response time, as shown in Table 3. Again, we can reject the null hypothesis.
+Finally, running ANOVA, we can see that the type of lock was the most significant factor for the response time, as shown in Table~\ref{tab:anova2}. Again, we can reject the null hypothesis.
 
 \begin{table}
 \begin{center}
-\caption{Graduate students ANOVA results.}
+\caption{Graduate students ANOVA results.}\label{tab:anova2}
 \begin{tabular}{|l|l|l|l|l|ll|}
 \hline
                  & Df &    Sum Sq &   Mean Sq  & F value &   Pr(>F) & \\   
@@ -192,8 +192,6 @@ Residuals        & 6 &  181610625 &   30268438 &         &           &     \\
 \end{center}
 \end{table}
 
-In the end of this paper, we provide the list of inputs and instructions on how to reproduce these results as attachments.
-
 \subsubsection{Accuracy Analysis.}
 
 We used the number of correct answers using each lock to measure accuracy, so we defined the following hypothesis to answer {\bf RQ2}. 
@@ -205,11 +203,11 @@ We used the number of correct answers using each lock to measure accuracy, so we
   H_{1} : \mu_{CorrectAnswersLockA} > \mu_{CorrectAnswersLockB}
 \end{equation}
 
-Once we collected all answers, we manually evaluated each one of them according to the criterias established previously, where each criteria had an associated value between 0 and 1. Then we've ran a script that evaluates the equation we defined before to classify whether an answer was correct or not. Grouping the results in tables, we have Table 4 and Table 5.
+Once we collected all answers, we manually evaluated each one of them according to the criterias established previously, where each criteria had an associated value between 0 and 1. Then we've ran a script that evaluates the equation we defined before to classify whether an answer was correct or not. Grouping the results in tables, we have Table~\ref{tab:acc1} and Table~\ref{tab:acc2}.
 
 \begin{table}
 \begin{center}
-\caption{Undergraduate students answers accuracy}
+\caption{Undergraduate students answers accuracy}\label{tab:acc1}
 \begin{tabular}{|l|l|l|}
 \hline
  & Correct & Incorrect\\
@@ -223,7 +221,7 @@ LockB & 16 & 15\\
 
 \begin{table}
 \begin{center}
-\caption{Graduate students answers accuracy}
+\caption{Graduate students answers accuracy}\label{tab:acc2}
 \begin{tabular}{|l|l|l|}
 \hline
  & Correct & Incorrect\\
@@ -235,11 +233,9 @@ LockB & 10 & 4\\
 \end{center}
 \end{table}
 
-Applying Fisher's exact test we can see that undergraduate students results presented a two-tailed P value equals 0.0004: the association between rows (groups) and columns (outcomes) is considered to be extremely statistically significant; consequently, there is clear evidence of improvement on accuracy (see Table 4).
+Applying Fisher's exact test we can see that undergraduate students results presented a two-tailed P value equals 0.0004: the association between rows (groups) and columns (outcomes) is considered to be extremely statistically significant; consequently, there is clear evidence of improvement on accuracy (see Table~\ref{tab:acc1}).
 
-Meanwhile graduate students results presented a two-tailed P value equals 0.3259, which does not represent a statistically significant evidence of improvement in accuracy (see Table 5).
-
-The input and the script to generate the tables are available as attachments in the end of this paper.
+Meanwhile graduate students results presented a two-tailed P value equals 0.3259, which does not represent a statistically significant evidence of improvement in accuracy (see Table~\ref{tab:acc2}).
 
 % TODO: add script and the data used (anonymized) to appendices or put on github and link %
 
