@@ -1,8 +1,8 @@
 \section{Evaluation}
 
-In this chapter we present an evaluation of our approach. Our evaluation comprises two parts: (i) a usability evaluation involving two experiments with two groups of students (Section~\ref{sec:usab}); and (ii) a preliminary analysis of the performance overhead of our approach (Section~\ref{sec:perf}).  The exact input, instructions, and any additional document we have used in this section are available in appendices or in our repository~\ref{repo}.
+In this chapter we present an evaluation of our approach. Our evaluation comprises two parts: (i) a usability evaluation involving two experiments with two groups of students (Section~\ref{sec:usab}); and (ii) a preliminary analysis of the performance overhead of our approach (Section~\ref{sec:perf}).  The exact input, instructions, and any additional document we have used in this section are available in appendices or in our repository~\cite{repo}.
 
-\section{Usability Evaluation}\label{sec:usab}
+\subsection{Usability Evaluation}\label{sec:usab}
 
 We ran empirical evaluation to measure the efficiency of deadlock exceptions with regard to problem solving speed and accuracy. We defined two research questions for this evaluation: 
 
@@ -30,7 +30,7 @@ E & Pointed unrelated methods as part of the deadlock \\
 \end{center}
 \end{table}
 
-\subsection{Time Analysis}
+\subsubsection{Time Analysis.}
 
 We defined the following hypothesis to answer {\bf RQ1}:
 
@@ -65,17 +65,18 @@ We wrote two programs with different complexity which were presented in the same
 
 % TODO: insert each program description here, where the deadlock was, etc. in the end, point to where the source for each pdf is %
 
-We have repeated this experiment for two groups of students with different backgrounds. The first group consisted of undergraduate students attending Programming Language Paradigms course. They had classes about concurrent programming, including exercises in Java using ReentrantLock where deadlocks and other concurrent bugs should be avoided; however, these students were not experienced in this area. The second group consisted of graduate students enrolled in master's degree or PhD program attending Parallel Programming course where they had classes about advanced concepts of parallel programming and had a lot of practical exercises, including implementing their own lock; thus, they were expected to have a lot of experience.
+We repeated this experiment twice.
+The two experiments had similar setups but differed in terms of the subjects. For the first experiment, the subjects comprised a group of third-year undergraduate students who underwent an 18-hour concurrent programming course. The course included a number of programming assignments. The experiment was conducted as a test for the course. The subjects of the second experiment were  graduate students enrolled in master's degree or PhD program attending a 40-hour Parallel Programming course with a focus on algorithms and data structures. They had classes about advanced concepts of parallel programming and had practical exercises, including implementing a number of different locking approaches. The participants in the second experiment were all volunteers and were not required to take part in it. Also, for both experiments, the assignments were the same. It asked students to identify any problems they could with the provided programs.
 
-%We did a survey with the second group to understand their background even further (see charts below) at the end of the experiment.
-
-% TODO: insert chart with survey results
+%We did a survey with the second group to understand their background even further (see charts below) at the end of the experiment. TODO: insert chart with survey results
 
 \subsubsection{Metrics Collection.}
 
-Each one should start the experiment with the first question containing \emph{Program 1} and once they finish to provide an answer, they should request for the second question. At that point, we collect and place a timestamp in their answer. Once they finish the second question containing \emph{Program 2}, then they should again give us a notice so we can leave a new timestamp. We have used these timestamps to measure how long they took to finish each question. We have started this experiment with a time limit for each question of 60 minutes each. However, during the test we realized it could not be sufficient for all students so we expanded to 90 minutes each.
+All students started the experiment with program \emph{Bank}. When they finished, they received the second program, \emph{Eclipse}. When a student finished one of the programs, we set a timestamp on it, or in a few cases, we allowed students to do it by themselves but we had to double check the values and fix in case there was any error. The timestamp was written based on a chronometer visible to everyone in the laboratory. For the first group (undergraduate students), we allowed 90 minutes per program. For the second group (graduate students), we allowed 60 minutes per program. 
 
-The timestamp was written by students conducting the experiment based on a counter we projected on the laboratory wall in real time. In a few circunstances the subject could write the timestamp when they finish, but we have double checked the value at the time we collected their answer, overwriting in case they did any mistake.
+Each one should start the experiment with the first question containing \emph{Program 1} and once they finish to provide an answer, they should request for the second question. At that point, we collect and place a timestamp in their answer. Once they finish the second question containing \emph{Program 2}, then they should again give us a notice so we can leave a new timestamp. Later we used these timestamps to measure how long they took to finish each question. We have started this experiment with a time limit for each question of 60 minutes each. However, during the first experiment, students complained and we realized it would not be sufficient for all students so we expanded to 90 minutes.
+
+The timestamp was written by students conducting the experiment based on a counter we projected on the laboratory wall in real time. In a few circunstances the subject could write the timestamp when they finished, but we have double checked the value at the time we collected their answer, overwriting in case they did any mistake.
 
 \subsubsection{Experiment Operation.}
 
@@ -83,11 +84,11 @@ We executed this experiment in two different days. In the first day we did it wi
 
 On the first day we started with a time frame of 2 hours for the whole experiment, so we decided to set a deadline for each question and put a time limit of 1 hour each. Later we expanded the time limit to 1 hour 30 minutes for each question. On the second day we decided to stick with 1 hour each because there was no demand to extend it.
 
-\subsubsection{Results}
+\subsubsection{Results.}
 
-Time analysis was conducted with R Statistical Software using the inputs extracted from each day. We used the linear model described in Figure~\ref{fig:model} that considers the effect of different factors on the response variable as proposed by other authors~\cite{paola}, including the effect between each replica and treatment~\cite{sanchez}.
-
-Time analysis was conducted with R Statistical Software using the inputs\footnote{We provide the inputs we've used in the appendix.} extracted from each experimentation day. We've used the linear model described in Figure 1 that considers the effect of different factors on the response variable similarly to Paola's work \cite{paola}, but we've also added the effect between each replica and the treatment as explained by Sanchez in \cite{sanchez}.
+Time analysis was conducted with R Statistical Software using the inputs extracted from each day.
+We used the linear model described in Figure~\ref{fig:model} that considers the effect of different factors
+on the response variable as proposed by other authors~\cite{paola}~\cite{sanchez}.
 
 \begin{figure}
 \begin{center}
@@ -106,7 +107,10 @@ $\epsilon_{lijk}$ & - random error \\
 \end{center}
 \end{figure}
 
-Initially, we've plotted the box-plot graphic shown in Figure~\ref{fig:boxplot1}. We can see that answers with {\tt LockB} involved took more time to complete, but suddenly stop to grow not far from where {\tt LockA} reaches its peak. If there was no time limit on each question, we believe that {\tt LockB} times would show a much wider range.
+Initially, we've plotted box-plot graphic (Figure~\ref{fig:boxplot1}) and calculated the average time spent to solve tasks for both groups (Table~\ref{tab:mean1}).
+They show that students using {\tt LockB} took more time to complete the tasks.
+On Figure~\ref{fig:boxplot1}, we can see time spent for both groups stop at nearly the same point, and we believe the reason behind it is that we enforced a time limit for each question.
+If there was no such time limit on each question, we believe that {\tt LockB} time spent range would be significantly wider.
 
 \begin{figure}
 \centering
@@ -114,7 +118,24 @@ Initially, we've plotted the box-plot graphic shown in Figure~\ref{fig:boxplot1}
 \caption{First experiment box-plot graphic.}\label{fig:boxplot1}
 \end{figure}
 
-Then we've run the Box-Cox transformation - which is a power transformation - to reduce anomalies such as non-addivity and non-normality, obtaining the curve in the left of Figure~\ref{fig:transf1}. Since the value of $\lambda$ at the maximum point in the curve is not approximately 1, we should apply the transformation; that is, $Y_{lijk}$ should be powered to that $\lambda$ on our regression model. Running the same analysis again with the transformed model, we obtain the curve shown in the right of Figure~\ref{fig:transf1}.
+\begin{table}
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+ & Time Spent (seconds)\\
+\hline
+LockA & 4227.800 \\
+LockB & 5086.367 \\
+\hline
+\end{tabular}
+\caption{First experiment's average time spent}\label{tab:mean1}
+\end{table}
+
+Then we run the Box-Cox transformation - a power transformation - to reduce anomalies such as non-additivity and non-normality.
+First we verify if the transformation is needed, obtaining the curve in the left of Figure~\ref{fig:transf1}.
+Since the value of {\tt lambda} at the maximum point in the curve is not approximately 1, we should apply it.
+In order to apply the transformation, $Y_{lijk}$ should be powered to that $\lambda$ on our regression model.
+Now, using the transformed model, we obtain the curve shown in the right of Figure~\ref{fig:transf1}.
 
 \begin{figure}
 \includegraphics[height=4.5cm, width=6cm]{img/u2.png}
@@ -123,16 +144,26 @@ Then we've run the Box-Cox transformation - which is a power transformation - to
 \caption{First experiment: before and after box-cox transformation ($\lambda = 5$).}\label{fig:transf1}
 \end{figure}
 
-After applying Box-Cox transformation, we ran Tukey Test of Additivity that checks whether effect model is additive, so we can evaluate whether interaction between factors displayed on the rows and columns of each latin square won't affect significantly the response when the model is additive \cite{box}; thus, considering the following hypothesis:
+In the next step we ran Tukey Test of Additivity to check whether effect model was additive.
+Interaction between factors displayed on rows and columns of each latin square won't affect significantly the response only when the model is additive~\cite{box},
+so we must verify it (Figure~\ref{tab:tukey}).
 
+\begin{figure}
+\centering
 \begin{tabular}{ll}
 $H_{0}$ & : The model is additive \\
 $H_{1}$ & : $H_{0}$ is $false$ \\
 \end{tabular}
+\caption{Tukey Test of Additivity hypothesis}\label{tab:tukey}
+\end{figure}
 
-We have obtained a p-value of 0.514, which means we cannot reject $H_{0}$. Consequently the model was considered to be additive.
+When the test was executed, we obtained p-value of 0.514, which means we cannot reject $H_{0}$.
+Consequently the model was considered to be additive.
 
-Finally, we ran the ANOVA (ANalysis Of VAriance) test which compares the effect of treatments on the response variable, providing an approximated p-value for every associated factor. When a variable has \emph{p-value} $< 0.05$, it means that factor was significant to the response.
+Finally, we ran the ANOVA (ANalysis Of VAriance) test which compares the effect of treatments on the response variable,
+providing an approximated p-value for every associated factor (see Table~\ref{tab:anova1}).
+When a variable has p-value $< 0.05$, it means that factor was statistically significant to the response.
+It shows that {\bf lock factor was the most significant to the response}, allowing us to reject our null hypothesis defined in Equation 10.
 
 \begin{table}
 \begin{center}
@@ -151,17 +182,28 @@ Residuals       & 14 & 2.3340e+37 & 1.6671e+36 &         &           &     \\
 \end{center}
 \end{table}
 
-In Table~\ref{tab:anova1}, we can see that {\bf lock factor was the most significant to the response}, allowing us to reject our null hypothesis defined in Equation 10.
-
 Now we will show the results collected by the second experiment with graduate students. They were exposed to the same set of problems in a different day, but as explained before, they only had a time limit of 1 hour per question.
 
-When we analyze the box-plot for the second group displayed in Image~\ref{fig:boxplot2}, we can see there was a clear improvement on the time for students with \emph{LockA}.
+When we analyze the box-plot for the second group (Image~\ref{fig:boxplot2}) and their average time spent (Table~\ref{tab:mean2}), we can see there was a clear improvement on the time for students using \emph{LockA}.
 
 \begin{figure}
 \centering
 \includegraphics[height=4.5cm]{img/g1.png}
 \caption{Second experiment box-plot graphic.}\label{fig:boxplot2}
 \end{figure}
+
+\begin{table}
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+ & Time Spent (seconds)\\
+\hline
+LockA & 1737.714 \\
+LockB & 2507.714 \\
+\hline
+\end{tabular}
+\caption{Second experiment's average time spent}\label{tab:mean2}
+\end{table}
 
 Moving foward with the analysis, we check if a box-cox transformation is needed. Since the value is not approximately 1, we apply the power transformation the same way we did with the first experiment, but with the corresponding lambda value.
 

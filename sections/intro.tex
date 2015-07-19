@@ -21,13 +21,11 @@ Communication deadlocks are deadlocks caused by at least one thread waiting for 
 As other studies did~\cite{mcsdk}\cite{magicfuzzer}, in this work our focus is also on resource deadlocks and whenever the term \emph{deadlock} is used we will implicitly mean resource deadlock.
 
 In practice, developers employ a number of approaches to deal with deadlocks:
-\begin{itemize}
-\item Static program analyses \cite{marino}\cite{dawson}\cite{vivek}\cite{williams};
-\item Dynamic program analyses \cite{mcsdk}\cite{magicfuzzer}\cite{sammati}\cite{serenity}\cite{pyla}\cite{rx};
-\item Application-specific deadlock detection infrastructu\-res \cite{orderedlock};
-\item Techniques to guarantee the absence of deadlocks by construction \cite{marino};
-\item Model checking \cite{havelund}.
-\end{itemize}
+(i) static program analyses \cite{marino}\cite{dawson}\cite{vivek}\cite{williams};
+(ii) dynamic program analyses \cite{mcsdk}\cite{magicfuzzer}\cite{sammati}\cite{serenity}\cite{pyla}\cite{rx};
+(iii) application-specific deadlock detection infrastructu\-res \cite{orderedlock};
+(iv) techniques to guarantee the absence of deadlocks by construction \cite{marino};
+(v) model checking \cite{havelund}.
 The first two approaches are known to be heavyweight. In addition, the former often produces many false positives.
 The third approach has limited applicability and often imposes a high runtime overhead.
 The fourth approach has a low cost but cannot be employed in cases where it is not feasible to order lock acquisitions nor use non-blocking locking primitives.
@@ -36,10 +34,8 @@ Finally, model checking is a powerful solution but has limited scalability when 
 In this paper we advocate an approach that complements the aforementioned ones.
 In summary, we believe deadlocks should not fail silently but instead their occurrence should be signaled as exceptions at runtime.
 To make this vision possible, we leverage two insights:
-\begin{itemize}
-\item The vast majority of existing deadlocks occur between two threads attempting to acquire two locks (as reported by other authors~\cite{lu} and confirmed by us in Section~\ref{bugs});
-\item It is possible to efficiently introduce deadlock detection for these two-thread, two-lock deadlocks (TTTL deadlocks) within the locking mechanism itself, incurring in an overhead that is low for applications whose execution time is not dominated by locking.
-\end{itemize}
+(i) the vast majority of existing deadlocks occur between two threads attempting to acquire two locks (as reported by other authors~\cite{lu} and confirmed by us in Section~\ref{bugs});
+(ii) it is possible to efficiently introduce deadlock detection for these two-thread, two-lock deadlocks (TTTL deadlocks) within the locking mechanism itself, incurring in an overhead that is low for applications whose execution time is not dominated by locking.
 We present a new type of lock that automatically checks for TTTL deadlocks at runtime and, if one is found, throws an exception indicating the problem.
 We have implemented this approach as an extension to Java's {\tt ReentrantLock} class.
 Deadlock exceptions are already supported in programming languages such as Haskell \cite{marlow} and Go \cite{golang} but they focus on different types of deadlocks, and runtime exceptions for other concurrency bugs, e.g., for data races, have been proposed in previous studies~\cite{valor}.

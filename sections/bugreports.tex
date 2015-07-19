@@ -4,9 +4,9 @@ Attempting to generalize deadlock detection at runtime does not seem feasible fr
 
 \subsection{Sample Collection}
 
-We've chosen three open source projects which used Java as main programming language and made use of concurrent programming: Lucene, Eclipse and OpenJDK.
+We've chosen three open source projects which used Java as main programming language and made use of concurrent programming: Lucene\footnote{Lucene: http://lucene.apache.org/}, Eclipse\footnote{Eclipse: https://eclipse.org/} and OpenJDK\footnote{OpenJDK: http://openjdk.java.net/}.
 
-Lucene\footnote{Lucene: http://lucene.apache.org/} is a text search engine library that can be used along many applications, where concurrent programming was used to deliver high performance. Eclipse\footnote{Eclipse: https://eclipse.org/} is one of the most popular IDE for java developers. OpenJDK\footnote{OpenJDK: http://openjdk.java.net/} is an open-source implementation of the Java Platform. These three projects share a few similarities: they're written in Java; they have vast inventory of bug reports on their repositories and publicly available tools to search for bug reports; and lastly, they share a software development culture of reviews inside bug reports by discussing solutions to fix the problem. In particular, this last characteristic was very important to allows us to analyze bug reports and infer their classification with confidence.
+Lucene is a text search engine library that can be used along many applications, where concurrent programming was used to deliver high performance. Eclipse is one of the most popular IDE for java developers. OpenJDK is an open-source implementation of the Java Platform. These three projects share a few similarities: they're written in Java; they have vast inventory of bug reports on their repositories and publicly available tools to search for bug reports; and lastly, they share a software development culture of reviews inside bug reports by discussing solutions to fix the problem. In particular, this last characteristic was very important to allows us to analyze bug reports and infer their classification with confidence.
 
 We have initially searched in each repository for the keyword \emph{deadlock}, and we've collected 541 bug reports in total.
 Each project had a different bug repository, so we've changed slightly the query parameters to find relevant bug reports.
@@ -14,7 +14,7 @@ In Lucene, we've searched for bugs matching the word "deadlock" anywhere in the 
 In Eclipse, we've searched for the word "deadlock" in summary, where resolution was set as "fixed" and whose status was set as "resolved"; from this search, we've found 406 bugs~\footnote{Eclipse bug reports: http://goo.gl/qQnrEm}.
 In OpenJDK, we've searched for bugs with the word "deadlock" inside the summary, related to its module named "JDK", where issue type was "bug", resolution was "fixed" and status was "resolved"; finally, from this search, we've found 108 bugs~\footnote{OpenJDK bug reports: http://goo.gl/xYFfsO}.
 We then proceeded to calculate the sample size that would allow us to have 95\% of confidence level and 5\% sampling error with 50\% of response distribution, which resulted in 225 bugs.
-Thus we created a random sample of that size to analyze further~\footnote{Bug reports sample: http://goo.gl/zNsIGz}.
+Thus we created a random sample\footnote{Bug reports sample: http://goo.gl/zNsIGz} of that size to analyze further.
 
 \subsection{Data Labeling}
 

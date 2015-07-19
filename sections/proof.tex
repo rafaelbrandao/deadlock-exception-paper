@@ -175,12 +175,12 @@ Then the current thread checks on its list of owned locks whether any of them ha
 If positive, then we have a circular wait: this thread wants another lock, but the owner of that lock is waiting for a lock this thread owns.
 In that case, we must throw a deadlock exception.
 
-The changes described until this point were part the first version of the algorithm and it was quite simple to modify {\tt ReentrantLock} to support it.
-We used that version when we did our usability evaluation (Section~\ref{sec:usab}).
-The only issue was that we couldn't guarantee the exception would be thrown in both threads involved.
+The changes described previously were part the first version of the algorithm and we minimally changed  {\tt ReentrantLock} to support it.
+That version was used on our usability evaluation (Section~\ref{sec:usab}).
+The only problem of that algorithm is it couldn't guarantee the exception would be thrown in both threads involved.
 
-The next step was to guarantee that both threads would throw the exception.
-We will present again some functions to illustrate how they changed for this version.
+Later, we decided to tackle that problem and make it guarantee that both threads would throw the exception.
+We will present again some functions to illustrate how they changed for this last version.
 
 \medskip
 \noindent
@@ -227,7 +227,9 @@ void setExclusiveOwner(Thread t) {
 
 \end{verbatim}
 
-We expanded the algorithm by adding a list of threads on each lock object that will contain threads that just went into a deadlock and should also throw exception as soon as possible. Note this particular list is not thread-local, but it is also free from interference. The reason is that we also used a policy to only permit read or write on this tainted threads list for the owner of the lock (and there's at most one owner at any given time).
+We expanded the algorithm by adding a list of threads on each lock object containing threads that just went into a deadlock and should also throw exception as soon as possible.
+Note although this particular list is not thread-local, we guaranteed freedom from interference,
+as we applied a policy on that list of tainted threads to only permit read/write operations for the owner of the lock.
 
 When a deadlock was detected on the previous version, the following case was possible:
 one thread throws an exception and releases all its locks,
