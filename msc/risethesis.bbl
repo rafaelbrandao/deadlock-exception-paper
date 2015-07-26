@@ -1,0 +1,177 @@
+\begin{thebibliography}{\hspace{\parindent}}
+
+\bibitem[ACCIOLY(2012)ACCIOLY]{paola} ACCIOLY, P\@. \textbf{Comparing Different
+  Testing Strategies for Software Product Lines}. 2012. Disserta{\c{c}}{\~a}o
+  (Mestrado em Ci{\^e}ncia da Computa{\c{c}}{\~a}o) --- UFPE.
+
+\bibitem[AGRESTI(1992)AGRESTI]{agresti} AGRESTI, A\@. A survey of exact
+  inference for contingency tables. \textbf{Statistical Science}, [S.l.],
+  p.131--153, 1992.
+
+\bibitem[AIMONETTI(2015)AIMONETTI]{golang} AIMONETTI, M\@. \textbf{Go
+  Bootcamp}. URL: http://www.golangbootcamp.com/book/concurrency.
+
+\bibitem[BERGER et~al.(2009)BERGER; YANG; LIU; NOVARK]{berger} BERGER, E.~D.
+  et~al\@. Grace: safe multithreaded programming for c/c++. In: ACM SIGPLAN
+  NOTICES. \textbf{Anais{\ldots}} [S.l.:~s.n.], 2009. v.44, n.10, p.81--96.
+
+\bibitem[BISWAS et~al.(2015)BISWAS; ZHANG; BOND; LUCIA]{valor} BISWAS, S.
+  et~al\@. Efficient, Software-Only Data Race Exceptions. }, [S.l.], 2015.
+
+\bibitem[BOX; HUNTER; HUNTER(2005)BOX; HUNTER; HUNTER]{box} BOX, G.~E.; HUNTER,
+  J.~S.; HUNTER, W.~G\@. Statistics for experimenters: design, innovation, and
+  discovery. \textbf{AMC}, [S.l.], v.10, p.12, 2005.
+
+\bibitem[BOYAPATI; LEE; RINARD(2002)BOYAPATI; LEE; RINARD]{chand} BOYAPATI, C.;
+  LEE, R.; RINARD, M\@. Ownership types for safe programming: preventing data
+  races and deadlocks. In: ACM SIGPLAN NOTICES. \textbf{Anais{\ldots}}
+  [S.l.:~s.n.], 2002. v.37, n.11, p.211--230.
+
+\bibitem[BUSE; SADOWSKI; WEIMER(2011)BUSE; SADOWSKI; WEIMER]{buse} BUSE, R.~P.;
+  SADOWSKI, C.; WEIMER, W\@. Benefits and barriers of user evaluation in
+  software engineering research. \textbf{ACM SIGPLAN Notices}, [S.l.], v.46,
+  n.10, p.643--656, 2011.
+
+\bibitem[CAI; CHAN(2012)CAI; CHAN]{magicfuzzer} CAI, Y.; CHAN, W\@.
+  MagicFuzzer: scalable deadlock detection for large-scale applications. In:
+  INTERNATIONAL CONFERENCE ON SOFTWARE ENGINEERING, 34.
+  \textbf{Proceedings{\ldots}} [S.l.:~s.n.], 2012. p.606--616.
+
+\bibitem[CHROMIUM(2015)CHROMIUM]{chromium} CHROMIUM. URL:
+  http://code.google.com/chromium.
+
+\bibitem[DA~LUO; DAS; QI(2011)DA~LUO; DAS; QI]{mcsdk} DA~LUO, Z.; DAS, R.; QI,
+  Y\@. Multicore SDK: a practical and efficient deadlock detector for
+  real-world applications. In: SOFTWARE TESTING, VERIFICATION AND VALIDATION
+  (ICST), 2011 IEEE FOURTH INTERNATIONAL CONFERENCE ON. \textbf{Anais{\ldots}}
+  [S.l.:~s.n.], 2011. p.309--318.
+
+\bibitem[ENGLER; ASHCRAFT(2003)ENGLER; ASHCRAFT]{dawson} ENGLER, D.; ASHCRAFT,
+  K\@. RacerX: effective, static detection of race conditions and deadlocks.
+  In: ACM SIGOPS OPERATING SYSTEMS REVIEW. \textbf{Anais{\ldots}} [S.l.:~s.n.],
+  2003. v.37, n.5, p.237--252.
+
+\bibitem[FARCHI; TZOREF(????)FARCHI; TZOREF]{contest} FARCHI, E.; TZOREF, R\@.
+  \textbf{ConcurrentTesting - Advanced Testing for Multi-Threaded Java
+  Applications}. URL: http://www.golangbootcamp.com/book/concurrency.
+
+\bibitem[FIREFOX(2015)FIREFOX]{firefox} FIREFOX. URL:
+  http://www.mozilla.org/firefox.
+
+\bibitem[FLANAGAN et~al.(2013)FLANAGAN; LEINO; LILLIBRIDGE; NELSON; SAXE;
+  STATA]{cormac} FLANAGAN, C. et~al\@. PLDI 2002: extended static checking for
+  java. \textbf{ACM Sigplan Notices}, [S.l.], v.48, n.4S, p.22--33, 2013.
+
+\bibitem[GITHUB(2015)GITHUB]{repo} GITHUB. URL:
+  https://github.com/rafaelbrandao/java-lock-deadlock-exception.
+
+\bibitem[GRECHANIK et~al.(2013)GRECHANIK; HOSSAIN; BUY; WANG]{grechanik}
+  GRECHANIK, M. et~al\@. Preventing database deadlocks in applications. In:
+  JOINT MEETING ON FOUNDATIONS OF SOFTWARE ENGINEERING, 2013.
+  \textbf{Proceedings{\ldots}} [S.l.:~s.n.], 2013. p.356--366.
+
+\bibitem[HANSEN(1975)HANSEN]{hansen} HANSEN, P.~B\@. The programming language
+  concurrent pascal. \textbf{Software Engineering, IEEE Transactions on},
+  [S.l.], n.2, p.199--207, 1975.
+
+\bibitem[HAVELUND; PRESSBURGER(2000)HAVELUND; PRESSBURGER]{havelund} HAVELUND,
+  K.; PRESSBURGER, T\@. Model checking java programs using java pathfinder.
+  \textbf{International Journal on Software Tools for Technology Transfer},
+  [S.l.], v.2, n.4, p.366--381, 2000.
+
+\bibitem[KNAPP(1987)KNAPP]{knapp} KNAPP, E\@. Deadlock detection in distributed
+  databases. \textbf{ACM Computing Surveys (CSUR)}, [S.l.], v.19, n.4,
+  p.303--328, 1987.
+
+\bibitem[LOZI et~al.(2012)LOZI; DAVID; THOMAS; LAWALL; MULLER et~al.]{lozi}
+  LOZI, J.-P. et~al\@. Remote Core Locking: migrating critical-section
+  execution to improve the performance of multithreaded applications. In:
+  USENIX ANNUAL TECHNICAL CONFERENCE. \textbf{Anais{\ldots}} [S.l.:~s.n.],
+  2012. p.65--76.
+
+\bibitem[LU et~al.(2008)LU; PARK; SEO; ZHOU]{lu} LU, S. et~al\@. Learning from
+  mistakes: a comprehensive study on real world concurrency bug
+  characteristics. In: ACM SIGPLAN NOTICES. \textbf{Anais{\ldots}}
+  [S.l.:~s.n.], 2008. v.43, n.3, p.329--339.
+
+\bibitem[LUK et~al.(2005)LUK; COHN; MUTH; PATIL; KLAUSER; LOWNEY; WALLACE;
+  REDDI; HAZELWOOD]{pin} LUK, C.-K. et~al\@. Pin: building customized program
+  analysis tools with dynamic instrumentation. In: ACM SIGPLAN NOTICES.
+  \textbf{Anais{\ldots}} [S.l.:~s.n.], 2005. v.40, n.6, p.190--200.
+
+\bibitem[MARINO et~al.(2013)MARINO; HAMMER; DOLBY; VAZIRI; TIP; VITEK]{marino}
+  MARINO, D. et~al\@. Detecting deadlock in programs with data-centric
+  synchronization. In: SOFTWARE ENGINEERING (ICSE), 2013 35TH INTERNATIONAL
+  CONFERENCE ON. \textbf{Anais{\ldots}} [S.l.:~s.n.], 2013. p.322--331.
+
+\bibitem[MARLOW(2013)MARLOW]{marlow} MARLOW, S\@. \textbf{Parallel and
+  Concurrent Programming in Haskell}: techniques for multicore and
+  multithreaded programming. [S.l.]: " O'Reilly Media, Inc.", 2013.
+
+\bibitem[MYSQL(2015)MYSQL]{mysql} MYSQL. URL: http://www.mysql.com.
+
+\bibitem[ORDEREDLOCK(2014)ORDEREDLOCK]{orderedlock} ORDEREDLOCK. URL:
+  http://www.cct.lsu.edu/~rguidry/ecl31docs/api/org/eclipse/core/internal/jobs/OrderedLock.html.
+
+\bibitem[PRAUN(2004)PRAUN]{praun} PRAUN, C.~von. \textbf{Detecting
+  synchronization defects in multi-threaded object-oriented programs}. 2004.
+  Tese (Doutorado em Ci{\^e}ncia da Computa{\c{c}}{\~a}o) --- ETH. Z{\"u}rich.
+
+\bibitem[PYE(2011)PYE]{ian} PYE, I\@. Locks, deadlocks and abstractions:
+  experiences with multi-threaded programming at cloudflare, inc. In: DSM'11,
+  TMC'11, AGERE! 2011, AOOPES'11, NEAT'11, \& VMIL'11.
+  \textbf{Proceedings{\ldots}} [S.l.:~s.n.], 2011. p.129--132.
+
+\bibitem[PYLA(2013)PYLA]{pyla} PYLA, H.~K\@. Safe Concurrent Programming and
+  Execution. }, [S.l.], 2013.
+
+\bibitem[PYLA; VARADARAJAN(2010)PYLA; VARADARAJAN]{sammati} PYLA, H.~K.;
+  VARADARAJAN, S\@. Avoiding deadlock avoidance. In: PARALLEL ARCHITECTURES AND
+  COMPILATION TECHNIQUES, 19. \textbf{Proceedings{\ldots}} [S.l.:~s.n.], 2010.
+  p.75--86.
+
+\bibitem[PYLA; VARADARAJAN(2012)PYLA; VARADARAJAN]{serenity} PYLA, H.~K.;
+  VARADARAJAN, S\@. Transparent runtime deadlock elimination. In: PARALLEL
+  ARCHITECTURES AND COMPILATION TECHNIQUES, 21. \textbf{Proceedings{\ldots}}
+  [S.l.:~s.n.], 2012. p.477--478.
+
+\bibitem[QIN et~al.(2005)QIN; TUCEK; SUNDARESAN; ZHOU]{rx} QIN, F. et~al\@. Rx:
+  treating bugs as allergies---a safe method to survive software failures. In:
+  ACM SIGOPS OPERATING SYSTEMS REVIEW. \textbf{Anais{\ldots}} [S.l.:~s.n.],
+  2005. v.39, n.5, p.235--248.
+
+\bibitem[RUNESON(2003)RUNESON]{runes} RUNESON, P\@. Using students as
+  experiment subjects--an analysis on graduate and freshmen student data. In:
+  INTERNATIONAL CONFERENCE ON EMPIRICAL ASSESSMENT IN SOFTWARE
+  ENGINEERING.--KEELE UNIVERSITY, UK, 7. \textbf{Proceedings{\ldots}}
+  [S.l.:~s.n.], 2003. p.95--102.
+
+\bibitem[SANCHEZ(2004)SANCHEZ]{sanchez} SANCHEZ, I\@. \textbf{Latin Squares and
+  Its Applications on Software Engineering}. 2004. Disserta{\c{c}}{\~a}o
+  (Mestrado em Ci{\^e}ncia da Computa{\c{c}}{\~a}o) --- UFPE.
+
+\bibitem[SHANBHAG(2008)SHANBHAG]{vivek} SHANBHAG, V.~K\@. Deadlock-detection in
+  java-library using static-analysis. In: SOFTWARE ENGINEERING CONFERENCE,
+  2008. APSEC'08. 15TH ASIA-PACIFIC. \textbf{Anais{\ldots}} [S.l.:~s.n.], 2008.
+  p.361--368.
+
+\bibitem[SINGHAL(1989)SINGHAL]{singhal} SINGHAL, M\@. Deadlock detection in
+  distributed systems. \textbf{Computer}, [S.l.], v.22, n.11, p.37--48, 1989.
+
+\bibitem[STARON(2007)STARON]{staron} STARON, M\@. Using Students as Subjects in
+  Experiments--A Quantitative Analysis of the Influence of Experimentation on
+  Students' Learning Proces. In: SOFTWARE ENGINEERING EDUCATION \& TRAINING,
+  2007. CSEET'07. 20TH CONFERENCE ON. \textbf{Anais{\ldots}} [S.l.:~s.n.],
+  2007. p.221--228.
+
+\bibitem[TANTER et~al.(2002)TANTER; S{\'E}GURA-DEVILLECHAISE; NOY{\'E};
+  PIQUER]{tanter} TANTER, {\'E}. et~al\@. Altering Java semantics via bytecode
+  manipulation. In: GENERATIVE PROGRAMMING AND COMPONENT ENGINEERING.
+  \textbf{Anais{\ldots}} [S.l.:~s.n.], 2002. p.283--298.
+
+\bibitem[WILLIAMS; THIES; ERNST(2005)WILLIAMS; THIES; ERNST]{williams}
+  WILLIAMS, A.; THIES, W.; ERNST, M.~D\@. Static deadlock detection for Java
+  libraries. In: \textbf{ECOOP 2005-Object-Oriented Programming}. [S.l.]:
+  Springer, 2005. p.602--629.
+
+\end{thebibliography}

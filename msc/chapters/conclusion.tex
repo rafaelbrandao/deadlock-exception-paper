@@ -1,0 +1,51 @@
+\chapter{Concluding Remarks}
+\label{conclusion}
+
+In this work, we have initially discussed how challenging it is to handle deadlocks and resolve them in real world software, and present many previous approaches that
+have tried to identify or solve deadlocks with either static analysis, dynamic analysis or a mix of the two approaches.
+
+Given that it's very costly to detect deadlocks in its general form, we've investigated which kind of deadlock is the most popular by looking at actual bug reports
+in relevant open source projects and classifying each deadlock manually. We've confirmed a previous study claim that classic deadlocks between two threads and two resources
+are the most frequent case of deadlock. This claim allowed us to focus on this specific case instead and minimally modify Java's \emph{ReentrantLock} to provide a lightweight
+version of a lock that detects this kind of deadlock in runtime.
+
+However, differently from previous approaches, we provided a runtime exception which should be raised on both threads involved in a \ac{tttl} deadlock
+when our Java's \emph{ReentrantLock} implementation is used, as we believe that developers would find bugs faster if deadlocks were just exceptions.
+
+Our usability evaluation with students shows that the presence of deadlock exception indeed reduce the amount of time spent to identify a bug in a code they were not familiar with.
+It also shows that less experienced students could identify the source of the deadlock correctly more easily.
+
+\section{Research Contributions}
+
+We can summarize our main contributions as follows:
+
+\begin{enumerate}
+\item Investigated deadlock bug reports in open source projects and confirmed a previous study claim that \ac{tttl} deadlocks are the most popular type of deadlock (92.07\% of all resource deadlocks we've identified).
+\item Implemented a lightweight version of {\tt ReentrantLock} that detects \ac{tttl} deadlocks and throw runtime exception on both threads.
+\item We measured implementation performance overhead with a very conservative benchmark and estimated our cost to be less than 6\% for worse case on real world applications.
+\item Presented a sketch of a proof to demonstrate why \ac{tttl} deadlock detection protocol is correct.
+\item Empriical evaluation shows that deadlock exceptions help to reduce time spent identifying deadlock bugs.
+\item Found evidence that allows us to hypothetize that deadlock exceptions are more helpful for less experienced developers.
+\end{enumerate}
+
+\section{Future Work}
+
+We finish this work with some proposals for future work based on some problems we found during this research or opportunities we identified.
+
+\begin{enumerate}
+\item 
+Significant amount of deadlock bugs we saw during bug reports study used synchronized blocks rather than explicit locks such as {\tt ReentrantLock}.
+In order to reach more Java developers, implementing deadlock detection on synchronized blocks should be investigated.
+\item
+Investigate if it is possible to add more bug context data into {\tt DeadlockException} while still keeping overhead low.
+It should be easier to understand more accurately details about deadlock in the exception message there is clear information about which threads were affected and which locks.
+\item
+We collected data about number of comments and time spent to solve tasks for bug reports we found, but we did not use in this research.
+It should help to investigate how difficult deadlock bugs are in comparison to non-deadlock bugs. Are developers discussing more on them, or are they spending more time to close tasks?
+\item
+Run empirical experiements with other groups of students grouped by experience in concurrent programming development
+to confirm whether deadlock exception benefits we saw are indeed more significant for less experienced developers.
+\item
+Search for deadlock bugs in projects written with other popular languages and investigate if there are significant differences for \ac{tttl} deadlocks distribution.
+\end{enumerate}
+

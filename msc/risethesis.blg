@@ -1,0 +1,59 @@
+This is BibTeX, Version 0.99d (TeX Live 2015/MacPorts 2015_1)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: risethesis.aux
+A level-1 auxiliary file: chapters/introduction.aux
+A level-1 auxiliary file: chapters/foundation.aux
+A level-1 auxiliary file: chapters/bugreports.aux
+A level-1 auxiliary file: chapters/proof.aux
+A level-1 auxiliary file: chapters/evaluation.aux
+A level-1 auxiliary file: chapters/conclusion.aux
+The style file: abnt.bst
+A level-1 auxiliary file: appendix/bug-reports-study.aux
+A level-1 auxiliary file: appendix/evaluation-instructions.aux
+Database file #1: references.bib
+`journal' is a missing field, not a string, for entry valor
+while executing---line 1346 of file abnt.bst
+`journal' is a missing field, not a string, for entry pyla
+while executing---line 1346 of file abnt.bst
+You've used 40 entries,
+            2371 wiz_defined-function locations,
+            788 strings with 10357 characters,
+and the built_in function-call counts, 53078 in all, are:
+= -- 6191
+> -- 497
+< -- 877
++ -- 3146
+- -- 257
+* -- 2142
+:= -- 4497
+add.period$ -- 159
+call.type$ -- 40
+change.case$ -- 454
+chr.to.int$ -- 610
+cite$ -- 40
+duplicate$ -- 6662
+empty$ -- 1813
+format.name$ -- 490
+if$ -- 11977
+int.to.chr$ -- 0
+int.to.str$ -- 0
+missing$ -- 0
+newline$ -- 83
+num.names$ -- 190
+pop$ -- 1158
+preamble$ -- 1
+purify$ -- 40
+quote$ -- 0
+skip$ -- 3585
+stack$ -- 0
+substring$ -- 3406
+swap$ -- 4188
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 222
+warning$ -- 0
+while$ -- 311
+width$ -- 0
+write$ -- 42
+(There were 2 error messages)

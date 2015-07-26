@@ -1,0 +1,122 @@
+\chapter{Bug Reports Study}\label{bugs}
+
+\section{Introduction}
+
+Attempting to generalize deadlock detection at runtime does not seem feasible from a performance viewpoint, since existing dynamic analyses take considerable time~\citep{magicfuzzer}. But study conducted by \citet{lu} found that 30 out of 31 deadlock bug reports involved at most two resources. We suspected \ac{tttl} deadlocks were more common in real world systems than more complex deadlocks, so we investigated this further. This chapter presents the results of this investigation.
+
+\section{Sample Collection}
+
+We've chosen three open source projects which used Java as main programming language and made use of concurrent programming: Lucene\footnote{http://lucene.apache.org/}, Eclipse\footnote{https://eclipse.org/} and OpenJDK\footnote{http://openjdk.java.net/}.
+
+Lucene is a text search engine library that can be used along many applications, where concurrent programming was used to deliver high performance. Eclipse is one of the most popular \ac{ide} for java developers. OpenJDK is an open-source implementation of the Java Platform. These three projects share a few similarities: they're written in Java; they have vast inventory of bug reports on their repositories and publicly available tools to search for bug reports; and lastly, they share a software development culture of reviews inside bug reports by discussing solutions to fix the problem. In particular, this last characteristic was very important to allows us to analyze bug reports and infer their classification with confidence.
+
+Initially a search for bug reports was conducted in each repository for the keyword \emph{deadlock}, collecting 541 bug reports in total.
+In reality, to perform a search for \emph{deadlock}, as each project had a different bug repository,
+we used slightly different query parameters to find relevant bug reports (more details in Table~\ref{tab:bug-reports-queries}).
+In Lucene, the results should match the word "deadlock" anywhere in the bug report (i.e. in summary or in comments), on module "lucene-core" with issue type set to "bug" and status as "closed", which found 27 bugs.
+In Eclipse, search was set to contain bugs with word "deadlock" in summary, with resolution set to "fixed" and status as "resolved", resulting in 406 bugs.
+In OpenJDK, bugs should contain word "deadlock" inside the summary, they should be related to its module named "JDK", but they also should have issue type "bug", resolution "fixed" and status "resolved", finding 108 bugs.
+We then proceeded to calculate the sample size that would allow us to have 95\% of confidence level and 5\% sampling error (with 50\% of response distribution for optimum size) which resulted in 225 bugs.
+Thus we created a random sample of that size to analyze further (see Appendix~\ref{ap:bug-reports-sample}).
+
+\section{Data Labeling}
+
+We have merged all bug reports of our random sample in one single table, where each row represented a different bug report and each column represents an attribute that we were interested.
+The first attribute was the name of the bug. Each name was composed by a prefix that could be either \emph{LUCENE}, \emph{ECLIPSE} or \emph{JDK}, followed by the bug number on their own repository.
+The second attribute was the category: a character that could be either "A", "B", "C" or "D", added by us after going through that particular bug report with our manual inspections.
+Other fields such as \emph{type}, \emph{number of threads}, \emph{number of resources} and \emph{notes} will be detailed shortly. Although we collected additional fields such as \emph{time} and \emph{comments} and made available in the final version of this table, we did not use them for the analysis conducted in this work.
+
+\subsection{Category}
+
+This is one of the most important fields, as we want to be able to identify what kind of deadlock this bug represents, or if it's not a real deadlock. We have four different values for this field and they must be one of the following:
+
+\begin{itemize}
+\item \emph{A:} We are confident this a resource deadlock. We should be able to provide a short explanation of how the bug occurs, which or how many threads are involved and how many locks are involved in this bug.
+
+\item \emph{B:} We are confident this is not a resource deadlock, so it must be a communication deadlock. It might be a lost notify/signal bug. We should be able to identify if this is a lost notify/signal or have clear evidence this is not a resource deadlock (adding a note whenever possible).
+
+\item \emph{C:} We are confident this is a false-positive for "deadlock" search. The term was used as a synonym of "hang" or "infinite loop", or to refer to another deadlock bug. In some cases, it is possible that a bug refers to another bug which was fixing a deadlock, so the initial bug may not be deadlock-related and just fix a regression for another bug (which could be deadlock-related). In other words, this is not a deadlock bug at all.
+
+\item \emph{D:} We are not confident whether this is a resource deadlock or a communication deadlock, or even if this is a false-positive for deadlock. There's not enough information in the bug report, or the information is just inconclusive. Since we are not experts on any of these code repositories, it's hard to classify in any other category.
+\end{itemize}
+
+General guideline for classifying bugs in category A was to only assign it when there was a clear comment in the bug explaining what threads and which resources are involved or other evidences can clarify without doubt how many threads and lock resources are involved. In a few cases, the explanation was not fully clear but the attachments on the bug provided a clear thread dump report showing which threads were involved and which locks each one were holding and waiting for. When such evidence was present, we could use it to make the final decision. Similarly, bugs in category B could also be confirmed by looking into source code changes in cases where we were almost clear about its category. For example, if the patch changes areas of the code where a notifyAll is added or moved, then it serves as a strong evidence to confirm it should be indeed in category B. In other cases, it is deadlock where the first thread is holding a lock but also it is in an infinite loop waiting for others to finish while other threads are stuck waiting to acquire a lock the first thread already acquired, so we would understand it as a communication deadlock: the "message" or "signal" which the first thread have been waiting is whether the other threads have finished, but it never arrives. Luckily, category C was often easy to classify since there usually was a comment in the bug report referencing another kind of bug, using the term "deadlock" as a synonym for "hang". If a particular bug only has a comment that refers to another bug (e.g. a regression) as a deadlock bug, then the bug being investigated might not be a deadlock by itself, which would also fall into this category. Finally, category D is for all other bugs which could not be classified as either A, B or C.
+
+
+\subsection{Number of threads/resources}
+
+Whenever possible, the reviewer should state the number of threads and resources involved, even if this is in the category B. If it's unknown how many resources but it is clear how many threads are involved, then only one of them should be filled and the other field should remain empty.
+
+\subsection{Type}
+
+This field is just an annotation and it should be used to specify what kinds of resources a certain bug use. For example if there were two threads and they were in a circular deadlock, then this field should be \emph{locks/synchronized}. If explicit locks were used on both threads, then just \emph{locks} should be used, or if only synchronized blockswere involved, then just \emph{synchronized} should be present. The symbol + indicates a separation between threads, so for example "locks + wait" means that one thread holds a lock while the other (probably holding the lock) waits for a signal. Unfortunately, as this nomenclature could be confusing, the field \emph{notes} should be used to clarify and write down what was found about this bug.
+
+\subsection{Notes}
+
+This field was encouraged to be used specially to remind other reviewers in the future of how the conclusion was made for cases where it was not straight-forward to choose the category. In these cases, it should contain the evidence found that helped the final decision to be made.
+
+\section{Labeling Guidelines} 
+
+In order to minimize error/bias on our classification and organized how the review was executed, we've created a set of guidelines that every reviewer should follow which basically describes how data should be analyzed for a certain bug, in what order, and what decisions could be made:
+
+\begin{enumerate}
+\item Look at bug title and bug main description (usually the first comment). Sometimes the reporter have an idea of how the bug occurs and which threads are involved, so this is a big help.
+
+\item Look at further comments and see if someone understood this bug completely. Someone must have provided a reasonable explanation of how this bug occurs. If the category is already clear, then finish these steps; otherwise proceed.
+
+\item If available, look at the patches (specially the final patch) and what changes have been made. If uncertain about this bug being in category B and the patch either moves or adds a notifyAll call, then it most likely is a category B bug. If this is not the case, then proceed.
+
+\item If available, look at the related bugs or duplicates. It's often to find an initial bug that is unclear but which points out to a duplicate that have been largely discussed and is clear. Restart from step 1 for each of those related bugs. If a category was not assigned yet, then proceed.
+
+\item See other attachments if available, like text files with thread dumps or stack traces. If they provide enough information to clarify which category it is, then assign a category to it, otherwise proceed.
+
+\item Classify this bug in the category D.
+\end{enumerate}
+
+\section{Results Analysis}
+
+Since we want to find how many resource deadlock bugs were \ac{tttl} deadlocks, we discard bugs in B and C category because they can't be resource deadlocks. What we have left are the bugs we could not determine its category with confidence. Thus in the worse case all bugs in category D should be resource deadlocks but none of them should be \ac{tttl} deadlocks. Worse case scenario is given by Equation~\ref{eq:worse}. In that equation, \emph{bugs(...)} returns the number of bug reports that matches all parameters. Now, if we want to look at the best case scenario, then all bugs classified in D category must also be \ac{tttl} deadlocks. In worse case, 54.7\% resource deadlocks are \ac{tttl} deadlocks, while in the best case, 95.29\% are \ac{tttl} deadlocks. In Table~\ref{tab:categ} (second column), we can see in that from all resource deadlocks we identified, 92.07\% of them are indeed \ac{tttl} deadlocks.
+Another interesting finding is that 75.93\% of all deadlocks are indeed resource deadlocks.
+
+\begin{equation}\label{eq:worse}
+bugs\_ratio = \frac{ bugs(A, threads=2, resources=2) }{ bugs(A) + bugs(D) } \; .
+\end{equation}
+
+However neither the worse case nor the best case scenarios seems realistic. We believe that a more realistic scenario would be to assume that bugs in category D are distributed roughly the same way as those in categories A, B, and C. If that is the case (last column of Table~\ref{tab:categ}), out of all resource deadlocks, we estimate that 91.7\% of them would also be \ac{tttl} deadlocks. Thus \ac{tttl} deadlocks are certainly the most popular type of resource deadlocks, amounting to more than 9 out of every 10 resource deadlocks. This result makes it evident that an approach to automatically detect these deadlocks has practical value.
+
+\begin{table}
+\begin{center}
+\caption{Labeled Categories and Estimations}\label{tab:categ}
+\begin{tabular}{|l|l|l|}
+\hline
+Category & Number of Bugs & Estimated \\
+\hline
+A & 101 & 146 \\
+A and \ac{tttl} & 93 & 134  \\
+B & 32 & 46 \\
+C & 23 & 33 \\
+D & 69 & 0 \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\section{Threats to Validity}
+
+Although we've created a set of guidelines that all reviewers should follow expecting to have more than one reviewer available on this research,
+in reality we couldn't find more than one reviewer to execute the labeling on all bug reports due to constraints on time and resources. There is both an advantage
+and a disadvantage given by this limitation. The advantage is that it is easier to guarantee that all bug reports were reviewed following the exact same set of rules
+as they were all reviewed by the same person. The disadvantage, however, is that there was no second reviewer to double check if the labels
+were indeed coherent to their respective bug reports.
+
+Futhermore, one factor that might limit generalization of these findings is that we've looked at only three different open-source projects written mostly in Java.
+In the real world, software is written in many different languages, where each language may have different distributions of deadlock bugs.
+However, as we've implemented deadlock exceptions in Java's ReentrantLock, we focused on investigating what kind of deadlock bugs developers usually face when developing with Java.
+This way we could understand whether our solution could be useful in practice.
+For that purpose, we've carefully chosen popular open-source projects that represent high quality software and contain well established open source communities.
+Their repositories had a rich resource of bug reports with many comments and documents that actually helped us to label each bug individually and they provided
+online tools to allow us to search into their bug report archives which was essential for this study.
+We believe that these projects were representative to evaluate the distribution of deadlock bugs for software written in Java.
+We also suspect our findings are also true for other popular languages but we leave it open for future work.
+
+
